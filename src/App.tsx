@@ -21,6 +21,10 @@ import PatientDataEntry from "./pages/pcp/PatientDataEntry";
 
 // Specialist Pages
 import SpecialistDashboard from "./pages/specialist/SpecialistDashboard";
+import ReferralRequests from "./pages/specialist/ReferralRequests";
+import AvailabilityCalendar from "./pages/specialist/AvailabilityCalendar";
+import PatientTreatment from "./pages/specialist/PatientTreatment";
+import OutcomeSubmission from "./pages/specialist/OutcomeSubmission";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -138,22 +142,22 @@ function AppRoutes() {
       } />
       <Route path="/specialist/requests" element={
         <ProtectedRoute allowedRoles={['specialist']}>
-          <SpecialistDashboard />
+          <ReferralRequests />
         </ProtectedRoute>
       } />
       <Route path="/specialist/availability" element={
         <ProtectedRoute allowedRoles={['specialist']}>
-          <SpecialistDashboard />
+          <AvailabilityCalendar />
         </ProtectedRoute>
       } />
       <Route path="/specialist/treatment" element={
         <ProtectedRoute allowedRoles={['specialist']}>
-          <SpecialistDashboard />
+          <PatientTreatment />
         </ProtectedRoute>
       } />
       <Route path="/specialist/outcomes" element={
         <ProtectedRoute allowedRoles={['specialist']}>
-          <SpecialistDashboard />
+          <OutcomeSubmission />
         </ProtectedRoute>
       } />
 
