@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Stethoscope, UserCog, Shield, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { UserRole } from '@/types';
+import {FcGoogle} from 'react-icons/fc';
+import {FaFacebookF} from 'react-icons/fa';
+
 
 type AuthMode = 'signin' | 'signup';
 
@@ -34,6 +37,39 @@ const roleConfig = {
 
 const brandColor = '#069468';
 
+// Password strength calculator
+const calculatePasswordStrength = (password: string): { strength: number; label: string; color: string } => {
+  let strength = 0;
+  
+  // Length check
+  if (password.length >= 8) strength += 25;
+  
+  // Uppercase check
+  if (/[A-Z]/.test(password)) strength += 25;
+  
+  // Number check
+  if (/[0-9]/.test(password)) strength += 25;
+  
+  // Special character check
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 25;
+  
+  let label = 'Weak';
+  let color = '#ef4444'; // red
+  
+  if (strength >= 75) {
+    label = 'Strong';
+    color = '#22c55e'; // green
+  } else if (strength >= 50) {
+    label = 'Good';
+    color = '#eab308'; // yellow
+  } else if (strength >= 25) {
+    label = 'Fair';
+    color = '#f97316'; // orange
+  }
+  
+  return { strength, label, color };
+};
+
 export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>('signin');
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
@@ -50,6 +86,9 @@ export default function AuthPage() {
   const [signUpPhone, setSignUpPhone] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+  
+  // Password strength
+  const passwordStrength = calculatePasswordStrength(signUpPassword);
 
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -147,6 +186,8 @@ export default function AuthPage() {
           }
         }
       `}</style>
+
+      
 
       {/* Left Panel - Branding & Marketing */}
       <div 
@@ -267,6 +308,37 @@ export default function AuthPage() {
                       </button>
                     </div>
                   </div>
+                 <div className="space-y-2">
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        className="h-11 w-full flex items-center justify-center gap-3 
+             border border-gray-300 rounded-lg 
+             hover:bg-gray-50 transition-colors
+             font-medium text-gray-700">
+                        <FcGoogle size={20} />
+                        <span>Google</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="h-11 w-full flex items-center justify-center gap-3 
+             border border-gray-300 rounded-lg 
+             hover:bg-gray-50 transition-colors
+             font-medium text-gray-700"
+                      >
+                        <FaFacebookF size={20} color="#1877F2" />
+                        <span>Facebook</span>
+                      </button>
+                    </div>
+                  </div>
 
                   <div>
                     <Label className="text-gray-700 font-medium block mb-3">Select Your Role</Label>
@@ -280,10 +352,10 @@ export default function AuthPage() {
                             key={role}
                             type="button"
                             onClick={() => setSelectedRole(role)}
-                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                            className={`p-4 rounded-lg border-2 transition-all duration-300 transform ${
                               isSelected
-                                ? 'border-opacity-100 bg-opacity-10'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'scale-105 shadow-lg'
+                                : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
                             }`}
                             style={{
                               borderColor: isSelected ? brandColor : undefined,
@@ -291,12 +363,12 @@ export default function AuthPage() {
                             }}
                           >
                             <Icon 
-                              className={`h-6 w-6 mx-auto mb-2 transition-colors ${
-                                isSelected ? 'text-white' : 'text-gray-500'
+                              className={`h-6 w-6 mx-auto mb-2 transition-all duration-300 transform ${
+                                isSelected ? 'scale-125' : 'scale-100'
                               }`}
-                              style={{ color: isSelected ? brandColor : undefined }}
+                              style={{ color: isSelected ? brandColor : '#999' }}
                             />
-                            <div className={`text-xs font-semibold transition-colors ${
+                            <div className={`text-xs font-semibold transition-colors duration-300 ${
                               isSelected ? 'text-gray-900' : 'text-gray-600'
                             }`}>
                               {config.label.split(' ')[0]}
@@ -422,6 +494,44 @@ export default function AuthPage() {
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
                     </div>
+                    
+                    {/* Password Strength Meter */}
+                    {signUpPassword && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full transition-all duration-300"
+                              style={{ 
+                                width: `${passwordStrength.strength}%`,
+                                backgroundColor: passwordStrength.color
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold" style={{ color: passwordStrength.color }}>
+                            {passwordStrength.label}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500 space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className={signUpPassword.length >= 8 ? 'text-green-600' : 'text-gray-400'}>✓</span>
+                            <span>At least 8 characters</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={/[A-Z]/.test(signUpPassword) ? 'text-green-600' : 'text-gray-400'}>✓</span>
+                            <span>Uppercase letter</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={/[0-9]/.test(signUpPassword) ? 'text-green-600' : 'text-gray-400'}>✓</span>
+                            <span>Number</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={/[!@#$%^&*(),.?":{}|<>]/.test(signUpPassword) ? 'text-green-600' : 'text-gray-400'}>✓</span>
+                            <span>Special character</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -460,15 +570,23 @@ export default function AuthPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
-                        className="h-11 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
+                        className="h-11 w-full flex items-center justify-center gap-3 
+             border border-gray-300 rounded-lg 
+             hover:bg-gray-50 transition-colors
+             font-medium text-gray-700"
                       >
-                        Google
+                        <FcGoogle size={20} />
+                        <span>Google</span>
                       </button>
                       <button
                         type="button"
-                        className="h-11 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
+                        className="h-11 w-full flex items-center justify-center gap-3 
+             border border-gray-300 rounded-lg 
+             hover:bg-gray-50 transition-colors
+             font-medium text-gray-700"
                       >
-                        Facebook
+                        <FaFacebookF size={20} color="#1877F2" />
+                        <span>Facebook</span>
                       </button>
                     </div>
                   </div>
@@ -485,10 +603,10 @@ export default function AuthPage() {
                             key={role}
                             type="button"
                             onClick={() => setSelectedRole(role)}
-                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                            className={`p-4 rounded-lg border-2 transition-all duration-300 transform ${
                               isSelected
-                                ? 'border-opacity-100 bg-opacity-10'
-                                : 'border-gray-200 hover:border-gray-300'
+                                ? 'scale-105 shadow-lg'
+                                : 'border-gray-200 hover:border-gray-300 hover:scale-102 hover:shadow-md'
                             }`}
                             style={{
                               borderColor: isSelected ? brandColor : undefined,
@@ -496,12 +614,12 @@ export default function AuthPage() {
                             }}
                           >
                             <Icon 
-                              className={`h-6 w-6 mx-auto mb-2 transition-colors ${
-                                isSelected ? 'text-white' : 'text-gray-500'
+                              className={`h-6 w-6 mx-auto mb-2 transition-all duration-300 transform ${
+                                isSelected ? 'scale-125' : 'scale-100'
                               }`}
-                              style={{ color: isSelected ? brandColor : undefined }}
+                              style={{ color: isSelected ? brandColor : '#999' }}
                             />
-                            <div className={`text-xs font-semibold transition-colors ${
+                            <div className={`text-xs font-semibold transition-colors duration-300 ${
                               isSelected ? 'text-gray-900' : 'text-gray-600'
                             }`}>
                               {config.label.split(' ')[0]}
