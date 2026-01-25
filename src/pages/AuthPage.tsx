@@ -2,216 +2,543 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Activity, User, Stethoscope, UserCog, Shield } from 'lucide-react';
+import { User, Stethoscope, UserCog, Shield, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { UserRole } from '@/types';
+
+type AuthMode = 'signin' | 'signup';
 
 const roleConfig = {
   patient: {
     icon: User,
     label: 'Patient',
-    description: 'Access your health dashboard and AI assistant',
-    color: 'bg-chart-1'
+    description: 'Access health dashboard and AI assistant',
   },
   pcp: {
     icon: Stethoscope,
-    label: 'Primary Care',
+    label: 'Primary Care Provider',
     description: 'Manage patients and referrals',
-    color: 'bg-chart-2'
   },
   specialist: {
     icon: UserCog,
     label: 'Specialist',
-    description: 'Handle referral requests and treatments',
-    color: 'bg-chart-3'
+    description: 'Handle referral requests',
   },
   admin: {
     icon: Shield,
     label: 'Administrator',
-    description: 'System management and analytics',
-    color: 'bg-chart-4'
+    description: 'System management',
   }
 };
 
+const brandColor = '#069468';
+
 export default function AuthPage() {
+  const [mode, setMode] = useState<AuthMode>('signin');
   const [selectedRole, setSelectedRole] = useState<UserRole>('patient');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Sign In fields
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+
+  // Sign Up fields
+  const [signUpFullName, setSignUpFullName] = useState('');
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPhone, setSignUpPhone] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+
   const { login, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password, selectedRole);
+    await login(signInEmail, signInPassword, selectedRole);
     navigate(`/${selectedRole}`);
   };
 
-  const handleDemoLogin = async (role: UserRole) => {
-    await login('demo@careflow.ai', 'demo', role);
-    navigate(`/${role}`);
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (signUpPassword !== signUpConfirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    // For now, use the same login function - in real app, would call signup endpoint
+    await login(signUpEmail, signUpPassword, selectedRole);
+    navigate(`/${selectedRole}`);
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-chart-1 opacity-90" />
-        <div className="relative z-10 flex flex-col justify-center p-12 text-primary-foreground">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
-              <Activity className="h-7 w-7" />
-            </div>
-            <span className="text-2xl font-bold">CareFlow AI</span>
+    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+      <style>{`
+        .branding-panel {
+          position: fixed;
+          top: 0;
+          width: 50%;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 10;
+        }
+        
+        .branding-panel.signin-mode {
+          transform: translateX(0);
+          left: 0;
+        }
+        
+        .branding-panel.signup-mode {
+          transform: translateX(100%);
+          left: 0;
+        }
+        
+        .auth-panel {
+          position: fixed;
+          top: 0;
+          width: 50%;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          align-items: center;
+          transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 20;
+          overflow-y: auto;
+          padding-bottom: 2rem;
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+        
+        .auth-panel.signin-mode {
+          transform: translateX(0);
+          right: 0;
+        }
+        
+        .auth-panel.signup-mode {
+          transform: translateX(-100%);
+          right: 0;
+        }
+        
+        @media (max-width: 1024px) {
+          .branding-panel {
+            position: relative;
+            width: 100%;
+            transform: translateX(0) !important;
+            left: auto !important;
+            right: auto !important;
+            height: auto;
+            min-height: 100vh;
+            justify-content: flex-start;
+            padding-top: 2rem;
+          }
+          
+          .auth-panel {
+            position: relative;
+            width: 100%;
+            transform: translateX(0) !important;
+            left: auto !important;
+            right: auto !important;
+            height: auto;
+            min-height: 100vh;
+          }
+        }
+      `}</style>
+
+      {/* Left Panel - Branding & Marketing */}
+      <div 
+        className={`branding-panel hidden lg:flex ${mode === 'signin' ? 'signin-mode' : 'signup-mode'} relative overflow-hidden p-12`}
+        style={{ backgroundColor: brandColor }}
+      >
+          <div className="absolute inset-0 bg-gradient-to-br from-[#069468] via-[#069468] to-[#047353] opacity-95" />
+          <div className="absolute inset-0">
+            <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-10 -translate-x-1/2 -translate-y-1/2" 
+              style={{ backgroundColor: 'white' }} />
+            <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full opacity-5 translate-x-1/3 translate-y-1/3" 
+              style={{ backgroundColor: 'white' }} />
           </div>
-          <h1 className="text-4xl font-bold mb-4">
-            Intelligent Healthcare Referral Optimization
+
+          <div className="relative z-10 text-white">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+              <img
+                src="/icons/medical-wave.png"
+                alt="Refero AI Logo"
+                className="h-8 w-8 object-contain"
+              />
+            </div>
+            <span className="text-2xl font-bold">Refero.ai</span>
+          </div>
+
+          <h1 className="text-5xl font-bold mb-6 leading-tight">
+            Intelligent Healthcare Referral System
           </h1>
-          <p className="text-lg text-primary-foreground/80 mb-8">
+
+          <p className="text-lg text-white/80 mb-12 max-w-md">
             AI-powered triage, specialty matching, and care coordination for better patient outcomes.
           </p>
+
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">40%</div>
-              <div className="text-sm text-primary-foreground/70">Reduction in unnecessary referrals</div>
+              <div className="text-sm text-white/70">Fewer unnecessary referrals</div>
             </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">60%</div>
-              <div className="text-sm text-primary-foreground/70">Faster specialist matching</div>
+              <div className="text-sm text-white/70">Faster specialist matching</div>
             </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">95%</div>
-              <div className="text-sm text-primary-foreground/70">Patient satisfaction rate</div>
+              <div className="text-sm text-white/70">Patient satisfaction</div>
             </div>
-            <div className="bg-primary-foreground/10 rounded-lg p-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">24/7</div>
-              <div className="text-sm text-primary-foreground/70">AI health assistant available</div>
+              <div className="text-sm text-white/70">AI health assistant</div>
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Right Panel - Auth Form */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="flex items-center justify-center gap-2 mb-8 lg:hidden">
-            <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
-              <Activity className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold">CareFlow AI</span>
-          </div>
+      {/* Right Panel - Auth Forms */}
+      <div className={`auth-panel lg:bg-white ${mode === 'signin' ? 'signin-mode' : 'signup-mode'} relative overflow-hidden p-4 sm:p-6`}>
+          <div className="w-full max-w-md">
+            {/* Sign In Form */}
+            {mode === 'signin' && (
+              <div className="space-y-6">
+                {/* Mobile Logo */}
+                <div className="flex items-center justify-center gap-3 lg:hidden">
+                  <div 
+                    className="h-10 w-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    <img
+                      src="/icons/medical-wave.png"
+                      alt="Logo"
+                      className="h-6 w-6 object-contain"
+                    />
+                  </div>
+                  <span className="text-xl font-bold">Refero.ai</span>
+                </div>
 
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="demo">Quick Demo</TabsTrigger>
-            </TabsList>
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+                  <p className="text-gray-600">Sign in to your account to continue</p>
+                </div>
 
-            <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Welcome back</CardTitle>
-                  <CardDescription>Sign in to your account to continue</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div>
+                    <Label htmlFor="signin-email" className="text-gray-700 font-medium">Email Address</Label>
+                    <div className="relative mt-1">
+                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
-                        id="email"
+                        id="signin-email"
                         type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        value={signInEmail}
+                        onChange={(e) => setSignInEmail(e.target.value)}
                         required
+                        className="pl-10 h-11 border-gray-300"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="password">Password</Label>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="signin-password" className="text-gray-700 font-medium">Password</Label>
+                    <div className="relative mt-1">
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                       <Input
-                        id="password"
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        id="signin-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={signInPassword}
+                        onChange={(e) => setSignInPassword(e.target.value)}
                         required
+                        className="pl-10 pr-10 h-11 border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-gray-700 font-medium block mb-3">Select Your Role</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(Object.keys(roleConfig) as UserRole[]).map((role) => {
+                        const config = roleConfig[role];
+                        const Icon = config.icon;
+                        const isSelected = selectedRole === role;
+                        return (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => setSelectedRole(role)}
+                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                              isSelected
+                                ? 'border-opacity-100 bg-opacity-10'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            style={{
+                              borderColor: isSelected ? brandColor : undefined,
+                              backgroundColor: isSelected ? `${brandColor}15` : 'transparent',
+                            }}
+                          >
+                            <Icon 
+                              className={`h-6 w-6 mx-auto mb-2 transition-colors ${
+                                isSelected ? 'text-white' : 'text-gray-500'
+                              }`}
+                              style={{ color: isSelected ? brandColor : undefined }}
+                            />
+                            <div className={`text-xs font-semibold transition-colors ${
+                              isSelected ? 'text-gray-900' : 'text-gray-600'
+                            }`}>
+                              {config.label.split(' ')[0]}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full h-11 font-semibold text-white"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </Button>
+                </form>
+
+                <div className="text-center">
+                  <p className="text-gray-600">
+                    Don't have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setMode('signup')}
+                      className="font-semibold transition-colors"
+                      style={{ color: brandColor }}
+                    >
+                      Sign Up
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Sign Up Form */}
+            {mode === 'signup' && (
+              <div className="space-y-6">
+                {/* Mobile Logo */}
+                <div className="flex items-center justify-center gap-3 lg:hidden">
+                  <div 
+                    className="h-10 w-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    <img
+                      src="/icons/medical-wave.png"
+                      alt="Logo"
+                      className="h-6 w-6 object-contain"
+                    />
+                  </div>
+                  <span className="text-xl font-bold">Refero.ai</span>
+                </div>
+
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
+                  <p className="text-gray-600">Join us to get started</p>
+                </div>
+
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div>
+                    <Label htmlFor="signup-name" className="text-gray-700 font-medium">Full Name</Label>
+                    <Input
+                      id="signup-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={signUpFullName}
+                      onChange={(e) => setSignUpFullName(e.target.value)}
+                      required
+                      className="mt-1 h-11 border-gray-300"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="signup-email" className="text-gray-700 font-medium">Email Address</Label>
+                    <div className="relative mt-1">
+                      <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={signUpEmail}
+                        onChange={(e) => setSignUpEmail(e.target.value)}
+                        required
+                        className="pl-10 h-11 border-gray-300"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label>Role</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(Object.keys(roleConfig) as UserRole[]).map((role) => {
-                          const config = roleConfig[role];
-                          const Icon = config.icon;
-                          return (
-                            <button
-                              key={role}
-                              type="button"
-                              onClick={() => setSelectedRole(role)}
-                              className={`p-3 rounded-lg border-2 transition-all ${
-                                selectedRole === role
-                                  ? 'border-primary bg-primary/5'
-                                  : 'border-border hover:border-primary/50'
-                              }`}
-                            >
-                              <Icon className={`h-5 w-5 mx-auto mb-1 ${
-                                selectedRole === role ? 'text-primary' : 'text-muted-foreground'
-                              }`} />
-                              <div className={`text-sm font-medium ${
-                                selectedRole === role ? 'text-primary' : ''
-                              }`}>
-                                {config.label}
-                              </div>
-                            </button>
-                          );
-                        })}
+                  </div>
+
+                  <div>
+                    <Label htmlFor="signup-phone" className="text-gray-700 font-medium">Phone Number</Label>
+                    <div className="relative mt-1">
+                      <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-phone"
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        value={signUpPhone}
+                        onChange={(e) => setSignUpPhone(e.target.value)}
+                        className="pl-10 h-11 border-gray-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="signup-password" className="text-gray-700 font-medium">Password</Label>
+                    <div className="relative mt-1">
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={signUpPassword}
+                        onChange={(e) => setSignUpPassword(e.target.value)}
+                        required
+                        className="pl-10 pr-10 h-11 border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="signup-confirm-password" className="text-gray-700 font-medium">Confirm Password</Label>
+                    <div className="relative mt-1">
+                      <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                      <Input
+                        id="signup-confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={signUpConfirmPassword}
+                        onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+                        required
+                        className="pl-10 pr-10 h-11 border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Social Auth Buttons */}
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-gray-50 text-gray-500">Or continue with</span>
                       </div>
                     </div>
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? 'Signing in...' : 'Sign In'}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="demo">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Quick Demo Access</CardTitle>
-                  <CardDescription>Select a role to explore the platform</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {(Object.keys(roleConfig) as UserRole[]).map((role) => {
-                    const config = roleConfig[role];
-                    const Icon = config.icon;
-                    return (
-                      <Button
-                        key={role}
-                        variant="outline"
-                        className="w-full justify-start h-auto p-4"
-                        onClick={() => handleDemoLogin(role)}
-                        disabled={isLoading}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        className="h-11 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
                       >
-                        <div className={`h-10 w-10 rounded-lg ${config.color} flex items-center justify-center mr-3`}>
-                          <Icon className="h-5 w-5 text-primary-foreground" />
-                        </div>
-                        <div className="text-left">
-                          <div className="font-medium">{config.label}</div>
-                          <div className="text-sm text-muted-foreground">{config.description}</div>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                        Google
+                      </button>
+                      <button
+                        type="button"
+                        className="h-11 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700"
+                      >
+                        Facebook
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-gray-700 font-medium block mb-3">Select Your Role</Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {(Object.keys(roleConfig) as UserRole[]).map((role) => {
+                        const config = roleConfig[role];
+                        const Icon = config.icon;
+                        const isSelected = selectedRole === role;
+                        return (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => setSelectedRole(role)}
+                            className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                              isSelected
+                                ? 'border-opacity-100 bg-opacity-10'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            style={{
+                              borderColor: isSelected ? brandColor : undefined,
+                              backgroundColor: isSelected ? `${brandColor}15` : 'transparent',
+                            }}
+                          >
+                            <Icon 
+                              className={`h-6 w-6 mx-auto mb-2 transition-colors ${
+                                isSelected ? 'text-white' : 'text-gray-500'
+                              }`}
+                              style={{ color: isSelected ? brandColor : undefined }}
+                            />
+                            <div className={`text-xs font-semibold transition-colors ${
+                              isSelected ? 'text-gray-900' : 'text-gray-600'
+                            }`}>
+                              {config.label.split(' ')[0]}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading}
+                    className="w-full h-11 font-semibold text-white"
+                    style={{ backgroundColor: brandColor }}
+                  >
+                    {isLoading ? 'Creating account...' : 'Create Account'}
+                  </Button>
+                </form>
+
+                <div className="text-center">
+                  <p className="text-gray-600">
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setMode('signin')}
+                      className="font-semibold transition-colors"
+                      style={{ color: brandColor }}
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
     </div>
   );
 }

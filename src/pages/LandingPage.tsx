@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import medicalWave from "@/icons/medical-wave.png";
 import {
   Activity,
   ArrowRight,
@@ -78,9 +79,14 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <Activity className="h-5 w-5 text-primary-foreground" />
+              <img
+  src="/icons/medical-wave.png"
+  alt="Health Icon"
+  className="h-45 w-45 object-contain"
+/>
+
             </div>
-            <span className="font-bold text-xl">CareFlow AI</span>
+            <span className="font-bold text-xl">Refero.ai</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/auth">
@@ -192,7 +198,7 @@ export default function LandingPage() {
             <CardContent className="p-12 text-center">
               <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Healthcare Referrals?</h2>
               <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-                Join leading healthcare organizations using CareFlow AI to improve patient outcomes and operational efficiency.
+                Join leading healthcare organizations using Refero ai to improve patient outcomes and operational efficiency.
               </p>
               <Link to="/auth">
                 <Button size="lg" className="gap-2">
@@ -209,12 +215,15 @@ export default function LandingPage() {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <Activity className="h-4 w-4 text-primary-foreground" />
+             <img
+  src="/icons/medical-wave.png"
+  alt="Health Icon"
+  className="h-45 w-45 object-contain"
+/>
             </div>
-            <span className="font-semibold">CareFlow AI</span>
+            <span className="font-semibold">Refero.ai</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2026 CareFlow AI. All rights reserved.
           </p>
         </div>
       </footer>
