@@ -17,7 +17,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     {
       id: '1',
       type: 'info',
-      title: 'Welcome to CareFlow AI',
+      title: 'Welcome to w AI',
       message: 'Your intelligent healthcare referral platform is ready.',
       read: false,
       createdAt: new Date()

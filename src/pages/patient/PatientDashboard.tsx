@@ -24,7 +24,7 @@ export default function PatientDashboard() {
       specialty: 'Cardiology',
       status: 'in-progress',
       date: 'Jan 15, 2026',
-      doctor: 'Dr. Emily Rodriguez'
+      doctor: 'Dr. Balaji Kumar'
     },
     {
       id: '2',
@@ -39,7 +39,7 @@ export default function PatientDashboard() {
     {
       id: '1',
       type: 'Follow-up',
-      doctor: 'Dr. Michael Chen',
+      doctor: 'Dr. Mukunthan',
       date: 'Jan 28, 2026',
       time: '10:00 AM'
     }
@@ -51,7 +51,7 @@ export default function PatientDashboard() {
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Welcome back, Sarah</h2>
+            <h2 className="text-2xl font-bold tracking-tight">Welcome back, Praveen</h2>
             <p className="text-muted-foreground">Here's an overview of your healthcare journey</p>
           </div>
           <Link to="/patient/chat">

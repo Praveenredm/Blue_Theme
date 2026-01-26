@@ -68,7 +68,7 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Activity className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg hidden sm:block">CareFlow AI</span>
+            <span className="font-semibold text-lg hidden sm:block">Refer.ai </span>
           </Link>
 
           {/* Page Title */}
@@ -96,7 +96,7 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
                 <DropdownMenuSeparator />
                 <div className="max-h-64 overflow-auto">
                   <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                    <span className="font-medium">Welcome to CareFlow AI</span>
+                    <span className="font-medium">Welcome to Refer.ai</span>
                     <span className="text-sm text-muted-foreground">Your intelligent healthcare platform is ready.</span>
                   </DropdownMenuItem>
                 </div>

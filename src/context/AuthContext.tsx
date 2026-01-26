@@ -15,28 +15,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const demoUsers: Record<UserRole, User> = {
   patient: {
     id: 'p1',
-    email: 'patient@careflow.ai',
+    email: 'patient@Refero.ai',
     name: 'Sarah Johnson',
     role: 'patient',
     avatar: 'SJ'
   },
   pcp: {
     id: 'pcp1',
-    email: 'doctor@careflow.ai',
+    email: 'doctor@Refero.ai',
     name: 'Dr. Michael Chen',
     role: 'pcp',
     avatar: 'MC'
   },
   specialist: {
     id: 's1',
-    email: 'specialist@careflow.ai',
+    email: 'specialist@Refero.ai',
     name: 'Dr. Emily Rodriguez',
     role: 'specialist',
     avatar: 'ER'
   },
   admin: {
     id: 'a1',
-    email: 'admin@careflow.ai',
+    email: 'admin@Refero.ai',
     name: 'James Wilson',
     role: 'admin',
     avatar: 'JW'

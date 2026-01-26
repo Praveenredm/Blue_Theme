@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
 import {
   Bot,
   User,
@@ -20,6 +21,32 @@ import { ChatMessage, ChatOption } from '@/types';
 
 type ChatMode = 'main' | 'symptoms' | 'insurance';
 
+interface InsurerInfo {
+  category: 'Government' | 'Public' | 'Private';
+  website: string;
+}
+
+const indianInsurers: Record<string, InsurerInfo> = {
+  'CGHS': { category: 'Government', website: 'https://cghs.gov.in/' },
+  'ECHS': { category: 'Government', website: 'https://echs.gov.in/' },
+  'National Insurance': { category: 'Public', website: 'https://nationalinsurance.nic.co.in/' },
+  'United India Insurance': { category: 'Public', website: 'https://uiic.co.in/' },
+  'Oriental Insurance': { category: 'Public', website: 'https://orientalinsurance.org.in/' },
+  'New India Assurance': { category: 'Public', website: 'https://newindia.co.in/' },
+  'HDFC ERGO': { category: 'Private', website: 'https://www.hdfcergo.com/' },
+  'ICICI Lombard': { category: 'Private', website: 'https://www.icicilombard.com/' },
+  'Bajaj Allianz': { category: 'Private', website: 'https://www.bajajallianz.com/' },
+  'Reliance General': { category: 'Private', website: 'https://www.reliancegeneral.co.in/' },
+  'Tata AIG': { category: 'Private', website: 'https://www.tataaig.com/' },
+  'Apollo Munich': { category: 'Private', website: 'https://www.apollomunichinsurance.com/' },
+  'Star Health': { category: 'Private', website: 'https://www.starhealth.in/' },
+  'ManipalCigna': { category: 'Private', website: 'https://www.manipalcigna.com/' },
+  'Max Bupa': { category: 'Private', website: 'https://www.maxbupa.com/' },
+  'SBI General': { category: 'Private', website: 'https://www.sbigeneral.in/' },
+  'Kotak Mahindra': { category: 'Private', website: 'https://www.kotakgeneralinsurance.com/' },
+  'Cholamandalam MS': { category: 'Private', website: 'https://www.cholamsgeneral.in/' }
+};
+
 interface SymptomStep {
   question: string;
   options: ChatOption[];
@@ -34,7 +61,16 @@ const symptomFlow: SymptomStep[] = [
       { id: 'stomach', label: '🤢 Stomach Issues', value: 'stomach' },
       { id: 'fatigue', label: '😴 Fatigue or Weakness', value: 'fatigue' },
       { id: 'respiratory', label: '🫁 Breathing Difficulties', value: 'respiratory' },
-      { id: 'joint', label: '🦴 Joint or Muscle Pain', value: 'joint_pain' }
+      { id: 'joint', label: '🦴 Joint or Muscle Pain', value: 'joint_pain' },
+      { id: 'other', label: '❓ Other Symptoms', value: 'other' },
+      { id: 'multiple', label: '🔢 Multiple Symptoms', value: 'multiple' },
+      { id: 'none', label: '✅ No Symptoms', value: 'none' },
+      { id: 'unsure', label: '❓ Not Sure / Just Checking', value: 'unsure' },
+      { id: 'pregnancy', label: '🤰 Pregnancy-Related', value: 'pregnancy' },
+      { id: 'mental', label: '🧠 Mental Health Concerns', value: 'mental_health' },
+      { id: 'skin', label: '🩹 Skin Issues', value: 'skin' },
+      { id: 'allergy', label: '🤧 Allergy Symptoms', value: 'allergy' },
+      { id: 'infection', label: '🦠 Possible Infection', value: 'infection' }
     ]
   },
   {
@@ -60,6 +96,9 @@ const symptomFlow: SymptomStep[] = [
       { id: 'fever', label: '🌡️ Fever', value: 'fever' },
       { id: 'nausea', label: '🤢 Nausea', value: 'nausea' },
       { id: 'dizziness', label: '😵 Dizziness', value: 'dizziness' },
+      { id: 'shortness', label: '😤 Shortness of Breath', value: 'shortness_of_breath' },
+      { id: 'swelling', label: '🦵 Swelling', value: 'swelling' },
+      { id: 'bleeding', label: '🩸 Unusual Bleeding', value: 'bleeding' },
       { id: 'none', label: '✅ None of these', value: 'none' }
     ]
   }
@@ -94,9 +133,9 @@ const insuranceFlow: SymptomStep[] = [
   {
     question: "What's your monthly budget for health insurance?",
     options: [
-      { id: 'low', label: '💵 Under $200/month', value: 'low' },
-      { id: 'medium', label: '💵💵 $200-$400/month', value: 'medium' },
-      { id: 'high', label: '💵💵💵 $400+/month', value: 'high' }
+      { id: 'low', label: '💵 Under ₹10000-15000/month', value: 'low' },
+      { id: 'medium', label: '💵 ₹20000-₹25000/month', value: 'medium' },
+      { id: 'high', label: '💵💵 ₹55000+/month', value: 'high' }
     ]
   }
 ];
@@ -106,6 +145,7 @@ export default function HealthAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [userInput, setUserInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,7 +154,7 @@ export default function HealthAssistant() {
       {
         id: '1',
         type: 'bot',
-        content: "Hello! 👋 I'm your CareFlow AI Health Assistant. I'm here to help you with personalized health guidance. How can I assist you today?",
+        content: "Hello! 👋 I'm your Refero AI Health Assistant. I'm here to help you with personalized health guidance. How can I assist you today?",
         options: [
           { id: 'symptoms', label: '🩺 Check my symptoms', value: 'symptoms' },
           { id: 'insurance', label: '🛡️ Health insurance help', value: 'insurance' }
@@ -243,6 +283,52 @@ export default function HealthAssistant() {
     );
   };
 
+  const processMessage = (message: string) => {
+    const lowerMessage = message.toLowerCase();
+    let matchedInsurer: { name: string; category: string; website: string } | null = null;
+
+    // Check for exact insurer name match
+    for (const [name, info] of Object.entries(indianInsurers)) {
+      if (lowerMessage.includes(name.toLowerCase())) {
+        matchedInsurer = { name, ...info };
+        break;
+      }
+    }
+
+    if (matchedInsurer) {
+      // Supported insurer
+      addBotMessage(
+        `✅ Yes, we support **${matchedInsurer.name}** (${matchedInsurer.category} sector).\n\nOfficial website: [${matchedInsurer.website}](${matchedInsurer.website})`
+      );
+    } else if (lowerMessage.includes('insurance') || lowerMessage.includes('insurer') || lowerMessage.includes('accept') || lowerMessage.includes('support')) {
+      if (lowerMessage.includes('what') || lowerMessage.includes('list') || lowerMessage.includes('supported') || lowerMessage.includes('options')) {
+        // List supported insurances
+        const supportedList = Object.keys(indianInsurers).map(name => `• ${name} (${indianInsurers[name].category})`).join('\n');
+        addBotMessage(
+          `🛡️ We support the following major Indian health insurance providers:\n\n${supportedList}\n\nFor official websites and more details, please visit their respective sites.`
+        );
+      } else {
+        // Unrecognized or unsupported
+        const alternatives = ['Star Health', 'Max Bupa', 'HDFC ERGO', 'ICICI Lombard'];
+        addBotMessage(
+          `❌ I'm sorry, I couldn't identify that insurance provider in our supported list.\n\nWe support major Indian insurers. Here are some popular alternatives:\n• ${alternatives.join('\n• ')}\n\nPlease check our full list by asking "What insurances do you support?"`
+        );
+      }
+    } else {
+      // Not insurance related
+      addBotMessage(
+        "I'm here to help with health insurance questions and symptom checking. Please ask about specific insurance providers or use the options above for guided assistance."
+      );
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (!userInput.trim()) return;
+    addUserMessage(userInput);
+    processMessage(userInput);
+    setUserInput('');
+  };
+
   const handleRestart = () => {
     setMode('main');
     setCurrentStep(0);
@@ -250,7 +336,7 @@ export default function HealthAssistant() {
     setMessages([{
       id: '1',
       type: 'bot',
-      content: "Hello! 👋 I'm your CareFlow AI Health Assistant. I'm here to help you with personalized health guidance. How can I assist you today?",
+      content: "Hello! 👋 I'm your Refero.ai AI Health Assistant. I'm here to help you with personalized health guidance. How can I assist you today?",
       options: [
         { id: 'symptoms', label: '🩺 Check my symptoms', value: 'symptoms' },
         { id: 'insurance', label: '🛡️ Health insurance help', value: 'insurance' }
@@ -269,7 +355,7 @@ export default function HealthAssistant() {
                 <Bot className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
-                <h3 className="font-semibold">CareFlow Health Assistant</h3>
+                <h3 className="font-semibold">Refero.ai Health Assistant</h3>
                 <div className="flex items-center gap-1 text-sm text-chart-2">
                   <span className="h-2 w-2 rounded-full bg-chart-2"></span>
                   Online
@@ -336,6 +422,21 @@ export default function HealthAssistant() {
               ))}
             </div>
           </ScrollArea>
+
+          <div className="p-4 border-t border-border">
+            <div className="flex gap-2">
+              <Input
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Ask about insurance providers or type your question..."
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                className="flex-1"
+              />
+              <Button onClick={handleSendMessage} disabled={!userInput.trim()}>
+                Send
+              </Button>
+            </div>
+          </div>
         </Card>
       </div>
     </DashboardLayout>
