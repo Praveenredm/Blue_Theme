@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +19,24 @@ import {
 } from 'lucide-react';
 
 export default function LandingPage() {
+  const [showDemo, setShowDemo] = useState(false);
+
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowDemo(false);
+      }
+    };
+
+    if (showDemo) {
+      window.addEventListener('keydown', handleEsc);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [showDemo]);
+
   const features = [
     {
       icon: Brain,
@@ -120,9 +138,35 @@ export default function LandingPage() {
                 Start Free Trial <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="gap-2">
-              Watch Demo
-            </Button>
+            <Button
+  size="lg"
+  variant="outline"
+  className="gap-2"
+  onClick={() => setShowDemo(true)}
+>
+  Watch Demo
+</Button>
+{showDemo && (
+  <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center">
+    <div className="relative w-full max-w-4xl mx-4 bg-black rounded-lg">
+      <button
+        className="absolute top-3 right-3 text-white text-xl"
+        onClick={() => setShowDemo(false)}
+      >
+        ✕
+      </button>
+
+      <video
+        src="/Demo.mp4"
+        controls
+        autoPlay
+        className="w-full rounded-lg"
+      />
+    </div>
+  </div>
+  
+)}
+
           </div>
         </div>
       </section>

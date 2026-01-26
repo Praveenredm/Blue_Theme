@@ -14,6 +14,10 @@ import NotFound from "./pages/NotFound";
 // Patient Pages
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import HealthAssistant from "./pages/patient/HealthAssistant";
+import ReferralStatus from "./pages/patient/ReferralStatus";
+import Appointments from "./pages/patient/Appointments";
+import CareRecommendations from "./pages/patient/CareRecommendations";
+import Feedback from "./pages/patient/Feedback";
 
 // PCP Pages
 import PCPDashboard from "./pages/pcp/PCPDashboard";
@@ -28,6 +32,10 @@ import OutcomeSubmission from "./pages/specialist/OutcomeSubmission";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ReferralAnalytics from "./pages/admin/ReferralAnalytics";
+import SpecialistPerformance from "./pages/admin/SpecialistPerformance";
+import UserManagement from "./pages/admin/UserManagement";
+import SystemLogs from "./pages/admin/SystemLogs";
 
 const queryClient = new QueryClient();
 
@@ -78,12 +86,12 @@ function AppRoutes() {
       } />
       <Route path="/patient/referrals" element={
         <ProtectedRoute allowedRoles={['patient']}>
-          <PatientDashboard />
+          <ReferralStatus />
         </ProtectedRoute>
       } />
       <Route path="/patient/appointments" element={
         <ProtectedRoute allowedRoles={['patient']}>
-          <PatientDashboard />
+          <Appointments />
         </ProtectedRoute>
       } />
       <Route path="/patient/chat" element={
@@ -93,12 +101,12 @@ function AppRoutes() {
       } />
       <Route path="/patient/recommendations" element={
         <ProtectedRoute allowedRoles={['patient']}>
-          <PatientDashboard />
+          <CareRecommendations />
         </ProtectedRoute>
       } />
       <Route path="/patient/feedback" element={
         <ProtectedRoute allowedRoles={['patient']}>
-          <PatientDashboard />
+          <Feedback />
         </ProtectedRoute>
       } />
 
@@ -169,17 +177,17 @@ function AppRoutes() {
       } />
       <Route path="/admin/users" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <UserManagement />
         </ProtectedRoute>
       } />
       <Route path="/admin/analytics" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <ReferralAnalytics />
         </ProtectedRoute>
       } />
       <Route path="/admin/performance" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <SpecialistPerformance />
         </ProtectedRoute>
       } />
       <Route path="/admin/guidelines" element={
@@ -189,7 +197,7 @@ function AppRoutes() {
       } />
       <Route path="/admin/logs" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AdminDashboard />
+          <SystemLogs />
         </ProtectedRoute>
       } />
 
