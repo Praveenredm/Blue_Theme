@@ -1,0 +1,21 @@
+{
+  "name": "care-navigator-backend",
+  "version": "1.0.0",
+  "description": "Backend for CTS Referral System",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.22.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.17.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
