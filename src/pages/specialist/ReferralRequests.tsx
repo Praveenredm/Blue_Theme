@@ -23,7 +23,9 @@ import {
   Calendar as CalendarIcon,
   Search,
   Filter,
-  Eye
+  Eye,
+  Activity,
+  Brain
 } from 'lucide-react';
 
 interface ReferralRequest {
@@ -135,20 +137,25 @@ export default function ReferralRequests() {
     return matchesSearch && matchesUrgency;
   });
 
-  const getUrgencyColor = (urgency: string) => {
+  const getUrgencyStyles = (urgency: string) => {
     switch (urgency) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'default';
-      case 'low': return 'secondary';
-      default: return 'secondary';
+      case 'critical':
+        return { badge: 'bg-red-100 text-red-700 hover:bg-red-100 border-0', border: 'border-red-200', bg: 'bg-red-50' };
+      case 'high':
+        return { badge: 'bg-red-100 text-red-700 hover:bg-red-100 border-0', border: 'border-red-200', bg: 'bg-red-50' };
+      case 'medium':
+        return { badge: 'bg-orange-100 text-orange-700 hover:bg-orange-100 border-0', border: 'border-orange-200', bg: 'bg-orange-50' };
+      case 'low':
+        return { badge: 'bg-gray-100 text-gray-700 hover:bg-gray-100 border-0', border: 'border-gray-200', bg: 'bg-gray-50' };
+      default:
+        return { badge: 'bg-gray-100 text-gray-700 hover:bg-gray-100 border-0', border: 'border-gray-200', bg: 'bg-gray-50' };
     }
   };
 
   const getAiScoreColor = (score: number) => {
-    if (score >= 80) return 'text-destructive';
-    if (score >= 60) return 'text-amber-600';
-    return 'text-emerald-600';
+    if (score >= 80) return 'text-red-600 bg-red-50 border-red-200';
+    if (score >= 60) return 'text-orange-600 bg-orange-50 border-orange-200';
+    return 'text-green-600 bg-green-50 border-green-200';
   };
 
   const handleAccept = () => {
@@ -199,139 +206,152 @@ export default function ReferralRequests() {
 
   return (
     <DashboardLayout sidebar={<SpecialistSidebar />} title="Referral Requests">
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Referral Requests</h2>
-            <p className="text-muted-foreground">Review and manage incoming patient referrals</p>
+            <h1 className="text-3xl font-bold text-gray-900">Referral Requests</h1>
+            <p className="text-gray-500 mt-1">Review and manage incoming patient referrals</p>
           </div>
-          <Badge variant="outline" className="w-fit">
+          <Badge className="w-fit bg-blue-100 text-blue-700 hover:bg-blue-100 border-0 text-base px-4 py-2">
             {filteredRequests.length} pending requests
           </Badge>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by patient or condition..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <Filter className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Filter by urgency" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Urgencies</SelectItem>
-              <SelectItem value="critical">Critical</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Card className="border border-gray-200 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search by patient name or condition..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-11"
+                />
+              </div>
+              <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
+                <SelectTrigger className="w-full sm:w-[200px] h-11">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by urgency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Urgencies</SelectItem>
+                  <SelectItem value="critical">Critical</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Requests List */}
         <div className="space-y-4">
           {filteredRequests.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12">
-                <CheckCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-medium">No pending requests</p>
-                <p className="text-muted-foreground">All referrals have been processed</p>
+            <Card className="border border-gray-200 shadow-sm">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                  <CheckCircle className="h-8 w-8 text-gray-300" />
+                </div>
+                <p className="text-lg font-semibold text-gray-900">No pending requests</p>
+                <p className="text-gray-500 mt-1">All referrals have been processed</p>
               </CardContent>
             </Card>
           ) : (
             filteredRequests.map((request) => (
-              <Card key={request.id} className={cn(
-                "transition-all hover:shadow-md",
-                request.urgency === 'critical' && "border-destructive/50 bg-destructive/5"
-              )}>
+              <Card 
+                key={request.id} 
+                className={cn(
+                  "border shadow-sm transition-all hover:shadow-md",
+                  request.urgency === 'critical' && "border-red-300 bg-red-50/30"
+                )}
+              >
                 <CardContent className="p-6">
-                  <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
-                    {/* Patient Info */}
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold">{request.patient}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {request.patientAge} y/o {request.patientGender} • Referred by {request.referredBy}
-                            </p>
-                          </div>
+                  <div className="space-y-4">
+                    
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <User className="h-6 w-6 text-blue-600" />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={getUrgencyColor(request.urgency)}>
-                            {request.urgency === 'critical' && <AlertTriangle className="h-3 w-3 mr-1" />}
-                            {request.urgency}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">{request.receivedDate}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold text-gray-900">{request.patient}</h3>
+                            <Badge className={getUrgencyStyles(request.urgency).badge}>
+                              {request.urgency === 'critical' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                              {request.urgency.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {request.patientAge} y/o {request.patientGender} • Referred by {request.referredBy}
+                          </p>
                         </div>
                       </div>
+                      <span className="text-xs text-gray-500 whitespace-nowrap">{request.receivedDate}</span>
+                    </div>
 
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-sm font-medium mb-1">{request.condition}</p>
-                        <p className="text-sm text-muted-foreground">{request.chiefComplaint}</p>
-                      </div>
+                    {/* Condition */}
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                      <p className="text-sm font-semibold text-gray-900 mb-1">{request.condition}</p>
+                      <p className="text-sm text-gray-600">{request.chiefComplaint}</p>
+                    </div>
 
-                      {/* AI Score */}
-                      <div className="flex items-center gap-4 p-3 border rounded-lg bg-background">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">AI Referral Score:</span>
-                          <span className={cn("text-lg font-bold", getAiScoreColor(request.aiScore))}>
-                            {request.aiScore}/100
-                          </span>
+                    {/* AI Score Section */}
+                    <div className={cn("p-4 rounded-xl border", getAiScoreColor(request.aiScore))}>
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Brain className="h-5 w-5 text-blue-600" />
                         </div>
-                        <div className="h-4 border-l border-border" />
-                        <p className="text-sm text-muted-foreground flex-1">{request.aiRecommendation}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-semibold text-gray-900">AI Assessment</span>
+                            <span className={cn("text-lg font-bold", request.aiScore >= 80 ? 'text-red-600' : request.aiScore >= 60 ? 'text-orange-600' : 'text-green-600')}>
+                              {request.aiScore}/100
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700">{request.aiRecommendation}</p>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex lg:flex-col gap-2 lg:min-w-[140px]">
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
                       <Button
                         variant="outline"
-                        size="sm"
-                        className="flex-1 lg:w-full"
+                        className="flex-1 h-11 border-gray-300 hover:bg-gray-50"
                         onClick={() => {
                           setSelectedRequest(request);
                           setShowDetailsDialog(true);
                         }}
                       >
-                        <Eye className="h-4 w-4 mr-1" />
+                        <Eye className="h-4 w-4 mr-2" />
                         View Details
                       </Button>
                       <Button
-                        size="sm"
-                        className="flex-1 lg:w-full"
-                        onClick={() => {
-                          setSelectedRequest(request);
-                          setShowAcceptDialog(true);
-                        }}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Accept
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="flex-1 lg:w-full"
+                        variant="outline"
+                        className="flex-1 h-11 border-red-300 text-red-700 hover:bg-red-50"
                         onClick={() => {
                           setSelectedRequest(request);
                           setShowDeclineDialog(true);
                         }}
                       >
-                        <XCircle className="h-4 w-4 mr-1" />
+                        <XCircle className="h-4 w-4 mr-2" />
                         Decline
+                      </Button>
+                      <Button
+                        className="flex-1 h-11 bg-blue-600 hover:bg-blue-700"
+                        onClick={() => {
+                          setSelectedRequest(request);
+                          setShowAcceptDialog(true);
+                        }}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Accept Referral
                       </Button>
                     </div>
                   </div>
@@ -343,92 +363,114 @@ export default function ReferralRequests() {
 
         {/* Details Dialog */}
         <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Referral Details</DialogTitle>
+              <DialogTitle className="text-xl">Referral Details</DialogTitle>
               <DialogDescription>Complete patient information and referral details</DialogDescription>
             </DialogHeader>
             {selectedRequest && (
-              <div className="space-y-6">
+              <div className="space-y-6 py-4">
+                
+                {/* Patient Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Patient</label>
-                    <p className="font-medium">{selectedRequest.patient}</p>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <label className="text-xs font-medium text-gray-600 block mb-1">Patient Name</label>
+                    <p className="font-semibold text-gray-900">{selectedRequest.patient}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Age / Gender</label>
-                    <p className="font-medium">{selectedRequest.patientAge} y/o {selectedRequest.patientGender}</p>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <label className="text-xs font-medium text-gray-600 block mb-1">Age / Gender</label>
+                    <p className="font-semibold text-gray-900">{selectedRequest.patientAge} y/o {selectedRequest.patientGender}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Referred By</label>
-                    <p className="font-medium">{selectedRequest.referredBy}</p>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <label className="text-xs font-medium text-gray-600 block mb-1">Referred By</label>
+                    <p className="font-semibold text-gray-900">{selectedRequest.referredBy}</p>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Urgency</label>
-                    <Badge variant={getUrgencyColor(selectedRequest.urgency)}>{selectedRequest.urgency}</Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Chief Complaint</label>
-                  <p className="mt-1 p-3 bg-muted rounded-lg">{selectedRequest.chiefComplaint}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Vitals</label>
-                  <div className="grid grid-cols-4 gap-3 mt-2">
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">Blood Pressure</p>
-                      <p className="font-semibold">{selectedRequest.vitals.bp}</p>
-                    </div>
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">Heart Rate</p>
-                      <p className="font-semibold">{selectedRequest.vitals.heartRate} bpm</p>
-                    </div>
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">Temperature</p>
-                      <p className="font-semibold">{selectedRequest.vitals.temperature}°F</p>
-                    </div>
-                    <div className="p-3 bg-muted rounded-lg text-center">
-                      <p className="text-xs text-muted-foreground">BMI</p>
-                      <p className="font-semibold">{selectedRequest.vitals.bmi}</p>
-                    </div>
+                  <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <label className="text-xs font-medium text-gray-600 block mb-1">Urgency Level</label>
+                    <Badge className={getUrgencyStyles(selectedRequest.urgency).badge}>
+                      {selectedRequest.urgency.toUpperCase()}
+                    </Badge>
                   </div>
                 </div>
 
+                {/* Chief Complaint */}
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Medical History</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <label className="text-sm font-semibold text-gray-900 block mb-2">Chief Complaint</label>
+                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <p className="text-sm text-gray-700">{selectedRequest.chiefComplaint}</p>
+                  </div>
+                </div>
+
+                {/* Vitals */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-900 block mb-3">Vital Signs</label>
+                  <div className="grid grid-cols-4 gap-3">
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Blood Pressure</p>
+                      <p className="text-lg font-bold text-gray-900">{selectedRequest.vitals.bp}</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Heart Rate</p>
+                      <p className="text-lg font-bold text-gray-900">{selectedRequest.vitals.heartRate}</p>
+                      <p className="text-xs text-gray-500">bpm</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Temperature</p>
+                      <p className="text-lg font-bold text-gray-900">{selectedRequest.vitals.temperature}</p>
+                      <p className="text-xs text-gray-500">°F</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200 text-center">
+                      <p className="text-xs text-gray-600 mb-1">BMI</p>
+                      <p className="text-lg font-bold text-gray-900">{selectedRequest.vitals.bmi}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Medical History */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-900 block mb-3">Medical History</label>
+                  <div className="flex flex-wrap gap-2">
                     {selectedRequest.medicalHistory.map((item, i) => (
-                      <Badge key={i} variant="outline">{item}</Badge>
+                      <Badge key={i} className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">
+                        {item}
+                      </Badge>
                     ))}
                   </div>
                 </div>
 
-                <div className="p-4 border rounded-lg bg-primary/5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">AI Assessment</span>
-                    <span className={cn("text-lg font-bold", getAiScoreColor(selectedRequest.aiScore))}>
-                      Score: {selectedRequest.aiScore}/100
+                {/* AI Assessment */}
+                <div className={cn("p-5 rounded-xl border", getAiScoreColor(selectedRequest.aiScore))}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Brain className="h-5 w-5" />
+                      <span className="font-semibold text-gray-900">AI Assessment</span>
+                    </div>
+                    <span className={cn("text-2xl font-bold", selectedRequest.aiScore >= 80 ? 'text-red-600' : selectedRequest.aiScore >= 60 ? 'text-orange-600' : 'text-green-600')}>
+                      {selectedRequest.aiScore}/100
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">{selectedRequest.aiRecommendation}</p>
+                  <p className="text-sm text-gray-700">{selectedRequest.aiRecommendation}</p>
                 </div>
 
+                {/* Additional Notes */}
                 {selectedRequest.notes && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Additional Notes</label>
-                    <p className="mt-1 p-3 bg-muted rounded-lg text-sm">{selectedRequest.notes}</p>
+                    <label className="text-sm font-semibold text-gray-900 block mb-2">Additional Notes</label>
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <p className="text-sm text-gray-700">{selectedRequest.notes}</p>
+                    </div>
                   </div>
                 )}
               </div>
             )}
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>Close</Button>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowDetailsDialog(false)} className="h-11">
+                Close
+              </Button>
               <Button onClick={() => {
                 setShowDetailsDialog(false);
                 setShowAcceptDialog(true);
-              }}>
+              }} className="h-11 bg-blue-600 hover:bg-blue-700">
                 Accept Referral
               </Button>
             </DialogFooter>
@@ -437,7 +479,7 @@ export default function ReferralRequests() {
 
         {/* Accept Dialog */}
         <Dialog open={showAcceptDialog} onOpenChange={setShowAcceptDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Accept Referral</DialogTitle>
               <DialogDescription>
@@ -446,10 +488,16 @@ export default function ReferralRequests() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
-                <label className="text-sm font-medium">Select Date</label>
+                <label className="text-sm font-semibold text-gray-900 block mb-2">Select Date</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal mt-2", !appointmentDate && "text-muted-foreground")}>
+                    <Button 
+                      variant="outline" 
+                      className={cn(
+                        "w-full h-11 justify-start text-left font-normal border-gray-300",
+                        !appointmentDate && "text-gray-500"
+                      )}
+                    >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {appointmentDate ? format(appointmentDate, 'PPP') : 'Pick a date'}
                     </Button>
@@ -461,15 +509,14 @@ export default function ReferralRequests() {
                       onSelect={setAppointmentDate}
                       disabled={(date) => date < new Date()}
                       initialFocus
-                      className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
               <div>
-                <label className="text-sm font-medium">Select Time</label>
+                <label className="text-sm font-semibold text-gray-900 block mb-2">Select Time</label>
                 <Select value={appointmentTime} onValueChange={setAppointmentTime}>
-                  <SelectTrigger className="mt-2">
+                  <SelectTrigger className="h-11">
                     <SelectValue placeholder="Choose a time slot" />
                   </SelectTrigger>
                   <SelectContent>
@@ -480,9 +527,11 @@ export default function ReferralRequests() {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAcceptDialog(false)}>Cancel</Button>
-              <Button onClick={handleAccept}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowAcceptDialog(false)} className="h-11">
+                Cancel
+              </Button>
+              <Button onClick={handleAccept} className="h-11 bg-blue-600 hover:bg-blue-700">
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Confirm Appointment
               </Button>
@@ -492,7 +541,7 @@ export default function ReferralRequests() {
 
         {/* Decline Dialog */}
         <Dialog open={showDeclineDialog} onOpenChange={setShowDeclineDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Decline Referral</DialogTitle>
               <DialogDescription>
@@ -500,18 +549,20 @@ export default function ReferralRequests() {
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
-              <label className="text-sm font-medium">Reason for Declining</label>
+              <label className="text-sm font-semibold text-gray-900 block mb-2">Reason for Declining</label>
               <Textarea
                 value={declineReason}
                 onChange={(e) => setDeclineReason(e.target.value)}
                 placeholder="e.g., Patient would benefit more from a different specialty, not within my scope of practice..."
-                className="mt-2"
-                rows={4}
+                className="min-h-[120px] resize-none"
+                rows={5}
               />
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeclineDialog(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={handleDecline}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowDeclineDialog(false)} className="h-11">
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDecline} className="h-11">
                 <XCircle className="h-4 w-4 mr-2" />
                 Confirm Decline
               </Button>

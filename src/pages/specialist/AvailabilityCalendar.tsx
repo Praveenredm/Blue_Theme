@@ -18,7 +18,8 @@ import {
   Save,
   Calendar as CalendarIcon,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  CheckCircle2
 } from 'lucide-react';
 
 interface TimeSlot {
@@ -206,33 +207,35 @@ export default function AvailabilityCalendar() {
 
   return (
     <DashboardLayout sidebar={<SpecialistSidebar />} title="Availability Calendar">
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Availability Calendar</h2>
-            <p className="text-muted-foreground">Manage your schedule and appointment slots</p>
+            <h1 className="text-3xl font-bold text-gray-900">Availability Calendar</h1>
+            <p className="text-gray-500 mt-1">Manage your schedule and appointment slots</p>
           </div>
-          <Button onClick={saveSchedule} className="gap-2">
+          <Button onClick={saveSchedule} className="h-11 gap-2 bg-blue-600 hover:bg-blue-700">
             <Save className="h-4 w-4" />
             Save Changes
           </Button>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Calendar */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle className="text-lg">Select Date</CardTitle>
-              <CardDescription>Click on a date to manage slots</CardDescription>
+          
+          {/* Calendar Card */}
+          <Card className="lg:col-span-1 border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <CardTitle className="text-lg font-semibold">Select Date</CardTitle>
+              <CardDescription className="mt-1">Click on a date to manage slots</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={(date) => date && setSelectedDate(date)}
                 disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                className={cn("p-3 pointer-events-auto")}
+                className="rounded-lg border-0"
                 modifiers={{
                   working: (date) => {
                     const schedule = schedules.find(s => isSameDay(s.date, date));
@@ -240,87 +243,104 @@ export default function AvailabilityCalendar() {
                   }
                 }}
                 modifiersClassNames={{
-                  working: "bg-primary/10"
+                  working: "bg-blue-50 text-blue-700 font-semibold"
                 }}
               />
-              <div className="mt-4 flex items-center gap-4 text-sm">
+              <div className="mt-6 p-3 bg-blue-50 rounded-xl border border-blue-200">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded bg-primary/10" />
-                  <span>Working Day</span>
+                  <div className="h-3 w-3 rounded bg-blue-500" />
+                  <span className="text-sm font-medium text-gray-700">Working Day</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Day Schedule */}
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">
-                  {format(selectedDate, 'EEEE, MMMM d, yyyy')}
-                </CardTitle>
-                <CardDescription>
-                  {selectedSchedule?.isWorkingDay 
-                    ? `${getAvailableCount(selectedSchedule)} available slots`
-                    : 'Not a working day'
-                  }
-                </CardDescription>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Working Day</span>
-                  <Switch
-                    checked={selectedSchedule?.isWorkingDay ?? false}
-                    onCheckedChange={() => toggleWorkingDay(selectedDate)}
-                  />
+          {/* Day Schedule Card */}
+          <Card className="lg:col-span-2 border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <CardTitle className="text-lg font-semibold">
+                    {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    {selectedSchedule?.isWorkingDay 
+                      ? `${getAvailableCount(selectedSchedule)} available slots`
+                      : 'Not a working day'
+                    }
+                  </CardDescription>
                 </div>
-                {selectedSchedule?.isWorkingDay && (
-                  <Button size="sm" variant="outline" onClick={() => setShowAddSlotDialog(true)}>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Slot
-                  </Button>
-                )}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200">
+                    <span className="text-sm font-medium text-gray-700">Working Day</span>
+                    <Switch
+                      checked={selectedSchedule?.isWorkingDay ?? false}
+                      onCheckedChange={() => toggleWorkingDay(selectedDate)}
+                    />
+                  </div>
+                  {selectedSchedule?.isWorkingDay && (
+                    <Button size="sm" onClick={() => setShowAddSlotDialog(true)} className="h-9 bg-blue-600 hover:bg-blue-700">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Slot
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {!selectedSchedule?.isWorkingDay ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <CalendarIcon className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-lg font-medium">Day Off</p>
-                  <p className="text-muted-foreground">Toggle "Working Day" to add availability</p>
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                    <CalendarIcon className="h-8 w-8 text-gray-300" />
+                  </div>
+                  <p className="text-lg font-semibold text-gray-900">Day Off</p>
+                  <p className="text-gray-500 mt-1">Toggle "Working Day" to add availability</p>
                 </div>
               ) : selectedSchedule.slots.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Clock className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-lg font-medium">No Time Slots</p>
-                  <p className="text-muted-foreground mb-4">Add your first time slot for this day</p>
-                  <Button onClick={() => setShowAddSlotDialog(true)}>
+                <div className="flex flex-col items-center justify-center py-16">
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
+                    <Clock className="h-8 w-8 text-gray-300" />
+                  </div>
+                  <p className="text-lg font-semibold text-gray-900">No Time Slots</p>
+                  <p className="text-gray-500 mt-1 mb-4">Add your first time slot for this day</p>
+                  <Button onClick={() => setShowAddSlotDialog(true)} className="bg-blue-600 hover:bg-blue-700">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Time Slot
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-2">
                   {selectedSchedule.slots.map((slot) => (
                     <div
                       key={slot.id}
                       className={cn(
-                        "flex items-center justify-between p-3 rounded-lg border transition-colors",
+                        "flex items-center justify-between p-4 rounded-xl border transition-all",
                         slot.isAvailable 
-                          ? "bg-background border-border" 
-                          : "bg-muted/50 border-muted"
+                          ? "bg-white border-gray-200 hover:shadow-sm" 
+                          : "bg-gray-50 border-gray-200"
                       )}
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-1">
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{slot.start} - {slot.end}</span>
+                          <div className={cn(
+                            "w-10 h-10 rounded-lg flex items-center justify-center",
+                            slot.isAvailable ? "bg-blue-100" : "bg-gray-200"
+                          )}>
+                            <Clock className={cn(
+                              "h-5 w-5",
+                              slot.isAvailable ? "text-blue-600" : "text-gray-500"
+                            )} />
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{slot.start} - {slot.end}</p>
+                            <p className="text-xs text-gray-500">30 minutes</p>
+                          </div>
                         </div>
                         <Select
                           value={slot.appointmentType}
                           onValueChange={(value) => updateSlotType(slot.id, value)}
                         >
-                          <SelectTrigger className="w-[160px] h-8">
+                          <SelectTrigger className="w-[180px] h-9 border-gray-300">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -332,11 +352,16 @@ export default function AvailabilityCalendar() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={slot.isAvailable ? "default" : "secondary"}>
+                      <div className="flex items-center gap-3">
+                        <Badge className={cn(
+                          "font-medium border-0",
+                          slot.isAvailable 
+                            ? "bg-green-100 text-green-700 hover:bg-green-100" 
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-200"
+                        )}>
                           {slot.isAvailable ? (
                             <>
-                              <CheckCircle className="h-3 w-3 mr-1" />
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
                               Available
                             </>
                           ) : (
@@ -353,7 +378,7 @@ export default function AvailabilityCalendar() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="h-9 w-9 text-gray-400 hover:text-red-600 hover:bg-red-50"
                           onClick={() => removeSlot(slot.id)}
                         >
                           <X className="h-4 w-4" />
@@ -368,13 +393,13 @@ export default function AvailabilityCalendar() {
         </div>
 
         {/* Week Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Week Overview</CardTitle>
-            <CardDescription>Quick view of your availability this week</CardDescription>
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+            <CardTitle className="text-lg font-semibold">Week Overview</CardTitle>
+            <CardDescription className="mt-1">Quick view of your availability this week</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 gap-2">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-7 gap-3">
               {weekDays.map((day) => {
                 const schedule = schedules.find(s => isSameDay(s.date, day));
                 const availableCount = getAvailableCount(schedule);
@@ -386,21 +411,28 @@ export default function AvailabilityCalendar() {
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "p-3 rounded-lg border text-center transition-all hover:border-primary",
-                      isSelected && "border-primary bg-primary/5",
-                      !schedule?.isWorkingDay && "bg-muted/50"
+                      "p-4 rounded-xl border transition-all hover:shadow-sm",
+                      isSelected && "border-blue-300 bg-blue-50 shadow-sm",
+                      !isSelected && schedule?.isWorkingDay && "border-gray-200 bg-white hover:border-blue-200",
+                      !schedule?.isWorkingDay && "bg-gray-50 border-gray-200"
                     )}
                   >
-                    <p className="text-xs text-muted-foreground">{format(day, 'EEE')}</p>
-                    <p className={cn("text-lg font-semibold", isToday && "text-primary")}>
+                    <p className="text-xs font-medium text-gray-600 mb-1">{format(day, 'EEE')}</p>
+                    <p className={cn(
+                      "text-2xl font-bold mb-2",
+                      isToday && "text-blue-600",
+                      !isToday && "text-gray-900"
+                    )}>
                       {format(day, 'd')}
                     </p>
                     {schedule?.isWorkingDay ? (
-                      <Badge variant="secondary" className="text-xs mt-1">
+                      <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-0 text-xs font-medium">
                         {availableCount} slots
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs mt-1">Off</Badge>
+                      <Badge className="bg-gray-200 text-gray-700 hover:bg-gray-200 border-0 text-xs font-medium">
+                        Off
+                      </Badge>
                     )}
                   </button>
                 );
@@ -411,7 +443,7 @@ export default function AvailabilityCalendar() {
 
         {/* Add Slot Dialog */}
         <Dialog open={showAddSlotDialog} onOpenChange={setShowAddSlotDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Add Time Slot</DialogTitle>
               <DialogDescription>
@@ -421,9 +453,9 @@ export default function AvailabilityCalendar() {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Start Time</label>
+                  <label className="text-sm font-semibold text-gray-900 block mb-2">Start Time</label>
                   <Select value={newSlotStart} onValueChange={setNewSlotStart}>
-                    <SelectTrigger className="mt-2">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select start" />
                     </SelectTrigger>
                     <SelectContent>
@@ -434,9 +466,9 @@ export default function AvailabilityCalendar() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">End Time</label>
+                  <label className="text-sm font-semibold text-gray-900 block mb-2">End Time</label>
                   <Select value={newSlotEnd} onValueChange={setNewSlotEnd}>
-                    <SelectTrigger className="mt-2">
+                    <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select end" />
                     </SelectTrigger>
                     <SelectContent>
@@ -448,9 +480,9 @@ export default function AvailabilityCalendar() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium">Appointment Type</label>
+                <label className="text-sm font-semibold text-gray-900 block mb-2">Appointment Type</label>
                 <Select value={newSlotType} onValueChange={setNewSlotType}>
-                  <SelectTrigger className="mt-2">
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -463,9 +495,11 @@ export default function AvailabilityCalendar() {
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowAddSlotDialog(false)}>Cancel</Button>
-              <Button onClick={addNewSlot}>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" onClick={() => setShowAddSlotDialog(false)} className="h-11">
+                Cancel
+              </Button>
+              <Button onClick={addNewSlot} className="h-11 bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Slot
               </Button>
