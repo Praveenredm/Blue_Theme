@@ -127,7 +127,6 @@ export default function Feedback() {
       return;
     }
 
-    // Remove from pending and add to submitted
     setPendingList(prev => prev.filter(f => f.id !== selectedFeedback.id));
     setSubmittedList(prev => [{
       id: selectedFeedback.id,
@@ -148,20 +147,20 @@ export default function Feedback() {
   };
 
   const StarRating = ({ value, onChange }: { value: number; onChange: (v: number) => void }) => (
-    <div className="flex gap-1">
+    <div className="flex gap-2">
       {[1, 2, 3, 4, 5].map(star => (
         <button
           key={star}
           type="button"
           onClick={() => onChange(star)}
-          className="focus:outline-none focus:ring-2 focus:ring-primary rounded"
+          className="focus:outline-none focus:ring-2 focus:ring-amber-500 rounded-lg p-1 transition-transform hover:scale-110"
         >
           <Star
             className={cn(
-              "h-8 w-8 transition-colors",
+              "h-10 w-10 transition-all duration-200",
               star <= value 
-                ? "fill-amber-400 text-amber-400" 
-                : "text-muted-foreground hover:text-amber-300"
+                ? "fill-amber-400 text-amber-400 drop-shadow-md" 
+                : "text-gray-300 hover:text-amber-300"
             )}
           />
         </button>
@@ -186,113 +185,128 @@ export default function Feedback() {
       type="button"
       onClick={onSelect}
       className={cn(
-        "flex flex-col items-center gap-2 p-4 rounded-lg border transition-all",
+        "flex flex-col items-center gap-3 p-5 rounded-xl border-2 transition-all duration-200",
         selected 
-          ? "border-primary bg-primary/5" 
-          : "border-border hover:border-muted-foreground"
+          ? "border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200" 
+          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
       )}
     >
       <Icon className={cn(
-        "h-6 w-6",
-        selected ? "text-primary" : "text-muted-foreground"
+        "h-7 w-7 transition-colors",
+        selected ? "text-blue-600" : "text-gray-400"
       )} />
       <span className={cn(
-        "text-sm",
-        selected ? "font-medium" : "text-muted-foreground"
+        "text-sm font-medium",
+        selected ? "text-gray-900" : "text-gray-600"
       )}>{label}</span>
     </button>
   );
 
   return (
     <DashboardLayout sidebar={<PatientSidebar />} title="Feedback">
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Feedback</h2>
-          <p className="text-muted-foreground">Share your experience to help improve care quality</p>
+      <div className="space-y-8">
+        {/* Enhanced Header */}
+        <div className="space-y-1">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900">Feedback</h1>
+          <p className="text-lg text-gray-600">Share your experience to help improve care quality</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-600" />
+        {/* Enhanced Stats */}
+        <div className="grid gap-6 sm:grid-cols-3">
+          {/* Pending Reviews */}
+          <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-300 hover:shadow-lg hover:border-orange-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-100 to-transparent rounded-full -mr-16 -mt-16 opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative flex items-center gap-4">
+              <div className="p-3 bg-orange-100 rounded-xl">
+                <Clock className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{pendingList.length}</p>
-                <p className="text-sm text-muted-foreground">Pending Reviews</p>
+                <p className="text-4xl font-bold text-gray-900">{pendingList.length}</p>
+                <p className="text-sm font-medium text-gray-600">Pending Reviews</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{submittedList.length}</p>
-                <p className="text-sm text-muted-foreground">Submitted</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Star className="h-5 w-5 text-primary" />
+            </div>
+          </div>
+
+          {/* Submitted */}
+          <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-300 hover:shadow-lg hover:border-green-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-100 to-transparent rounded-full -mr-16 -mt-16 opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative flex items-center gap-4">
+              <div className="p-3 bg-green-100 rounded-xl">
+                <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">
+                <p className="text-4xl font-bold text-gray-900">{submittedList.length}</p>
+                <p className="text-sm font-medium text-gray-600">Submitted</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Avg Rating */}
+          <div className="group relative overflow-hidden bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-300 hover:shadow-lg hover:border-amber-300">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-100 to-transparent rounded-full -mr-16 -mt-16 opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative flex items-center gap-4">
+              <div className="p-3 bg-amber-100 rounded-xl">
+                <Star className="h-6 w-6 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-4xl font-bold text-gray-900">
                   {submittedList.length > 0 
                     ? (submittedList.reduce((acc, f) => acc + f.rating, 0) / submittedList.length).toFixed(1)
                     : '-'
                   }
                 </p>
-                <p className="text-sm text-muted-foreground">Avg Rating Given</p>
+                <p className="text-sm font-medium text-gray-600">Avg Rating Given</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Pending Feedback */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
+        {/* Enhanced Pending Feedback */}
+        <Card className="border-2 rounded-2xl shadow-sm">
+          <CardHeader className="border-b bg-gray-50/50">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-orange-600" />
               Pending Feedback
             </CardTitle>
-            <CardDescription>Share your experience from recent appointments</CardDescription>
+            <CardDescription className="mt-1">Share your experience from recent appointments</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {pendingList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <CheckCircle className="h-12 w-12 text-emerald-600 mb-4" />
-                <p className="text-lg font-medium">All Caught Up!</p>
-                <p className="text-muted-foreground">You have no pending feedback requests</p>
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="p-4 bg-green-100 rounded-full mb-4">
+                  <CheckCircle className="h-12 w-12 text-green-600" />
+                </div>
+                <p className="text-xl font-bold text-gray-900 mb-2">All Caught Up!</p>
+                <p className="text-gray-600">You have no pending feedback requests</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {pendingList.map(feedback => (
                   <div
                     key={feedback.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-900/10 gap-4"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 gap-4 hover:shadow-md transition-all"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                        <User className="h-5 w-5 text-amber-700 dark:text-amber-400" />
+                      <div className="p-3 bg-orange-100 rounded-xl shadow-sm">
+                        <User className="h-6 w-6 text-orange-700" />
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{feedback.doctor}</h3>
-                          <Badge variant="outline">{feedback.specialty}</Badge>
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-bold text-gray-900">{feedback.doctor}</h3>
+                          <Badge className="bg-white border-2 border-orange-200 text-orange-700 font-medium">
+                            {feedback.specialty}
+                          </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{feedback.description}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-sm text-gray-700 font-medium mb-1">{feedback.description}</p>
+                        <p className="text-xs text-gray-600">
                           Visit date: {format(feedback.date, 'MMMM d, yyyy')}
                         </p>
                       </div>
                     </div>
-                    <Button onClick={() => openFeedbackForm(feedback)} className="sm:min-w-[140px]">
+                    <Button 
+                      onClick={() => openFeedbackForm(feedback)} 
+                      className="sm:min-w-[160px] bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-md"
+                    >
                       <Star className="h-4 w-4 mr-2" />
                       Leave Feedback
                     </Button>
@@ -303,43 +317,47 @@ export default function Feedback() {
           </CardContent>
         </Card>
 
-        {/* Submitted Feedback */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5" />
+        {/* Enhanced Submitted Feedback */}
+        <Card className="border-2 rounded-2xl shadow-sm">
+          <CardHeader className="border-b bg-gray-50/50">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
               Submitted Feedback
             </CardTitle>
-            <CardDescription>Your previous feedback submissions</CardDescription>
+            <CardDescription className="mt-1">Your previous feedback submissions</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-6">
             {submittedList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <MessageSquare className="h-10 w-10 text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">No feedback submitted yet</p>
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="p-4 bg-gray-100 rounded-full mb-4">
+                  <MessageSquare className="h-10 w-10 text-gray-600" />
+                </div>
+                <p className="text-gray-600">No feedback submitted yet</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {submittedList.map(feedback => (
                   <div
                     key={feedback.id}
-                    className="flex items-center justify-between p-4 rounded-lg border bg-muted/30"
+                    className="flex items-center justify-between p-5 rounded-xl border-2 border-gray-100 bg-gray-50/50 hover:bg-gray-100/50 transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <CheckCircle className="h-5 w-5 text-emerald-600" />
+                      <div className="p-2 bg-green-100 rounded-lg">
+                        <CheckCircle className="h-6 w-6 text-green-600" />
+                      </div>
                       <div>
-                        <h3 className="font-medium">{feedback.doctor}</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 className="font-bold text-gray-900">{feedback.doctor}</h3>
+                        <p className="text-sm text-gray-600">
                           Submitted: {format(feedback.submittedAt, 'MMM d, yyyy')}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
                       {Array.from({ length: feedback.rating }).map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                        <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
                       ))}
                       {Array.from({ length: 5 - feedback.rating }).map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-muted-foreground" />
+                        <Star key={i} className="h-5 w-5 text-gray-300" />
                       ))}
                     </div>
                   </div>
@@ -349,40 +367,40 @@ export default function Feedback() {
           </CardContent>
         </Card>
 
-        {/* Feedback Dialog */}
+        {/* Enhanced Feedback Dialog */}
         <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Share Your Feedback</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-2xl font-bold">Share Your Feedback</DialogTitle>
+              <DialogDescription className="text-base">
                 {selectedFeedback?.doctor} - {selectedFeedback?.description}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6 py-4">
+            <div className="space-y-8 py-4">
               {/* Overall Rating */}
               <div>
-                <Label className="text-sm font-medium">Overall Experience *</Label>
-                <div className="flex justify-center mt-3">
+                <Label className="text-base font-bold text-gray-900 mb-4 block">Overall Experience *</Label>
+                <div className="flex justify-center">
                   <StarRating 
                     value={formData.overallRating} 
                     onChange={(v) => setFormData(prev => ({ ...prev, overallRating: v }))} 
                   />
                 </div>
-                <p className="text-center text-sm text-muted-foreground mt-2">
+                <p className="text-center text-sm font-semibold text-gray-700 mt-3">
                   {formData.overallRating === 0 && "Click to rate"}
-                  {formData.overallRating === 1 && "Poor"}
-                  {formData.overallRating === 2 && "Fair"}
-                  {formData.overallRating === 3 && "Good"}
-                  {formData.overallRating === 4 && "Very Good"}
-                  {formData.overallRating === 5 && "Excellent"}
+                  {formData.overallRating === 1 && "😞 Poor"}
+                  {formData.overallRating === 2 && "😐 Fair"}
+                  {formData.overallRating === 3 && "🙂 Good"}
+                  {formData.overallRating === 4 && "😊 Very Good"}
+                  {formData.overallRating === 5 && "🌟 Excellent"}
                 </p>
               </div>
 
               {/* Wait Time */}
               <div>
-                <Label className="text-sm font-medium">Wait Time Satisfaction</Label>
-                <div className="grid grid-cols-3 gap-3 mt-3">
+                <Label className="text-base font-bold text-gray-900 mb-4 block">Wait Time Satisfaction</Label>
+                <div className="grid grid-cols-3 gap-4">
                   <SatisfactionOption
                     value="satisfied"
                     selected={formData.waitTimeRating === 'satisfied'}
@@ -409,8 +427,8 @@ export default function Feedback() {
 
               {/* Communication */}
               <div>
-                <Label className="text-sm font-medium">Communication Quality</Label>
-                <div className="grid grid-cols-3 gap-3 mt-3">
+                <Label className="text-base font-bold text-gray-900 mb-4 block">Communication Quality</Label>
+                <div className="grid grid-cols-3 gap-4">
                   <SatisfactionOption
                     value="satisfied"
                     selected={formData.communicationRating === 'satisfied'}
@@ -437,46 +455,55 @@ export default function Feedback() {
 
               {/* Would Recommend */}
               <div>
-                <Label className="text-sm font-medium">Would you recommend this provider?</Label>
+                <Label className="text-base font-bold text-gray-900 mb-4 block">Would you recommend this provider?</Label>
                 <RadioGroup
                   value={formData.wouldRecommend}
                   onValueChange={(v) => setFormData(prev => ({ ...prev, wouldRecommend: v as FeedbackFormData['wouldRecommend'] }))}
-                  className="flex gap-4 mt-3"
+                  className="flex gap-4"
                 >
-                  <Label className="flex items-center gap-2 cursor-pointer">
+                  <Label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 hover:bg-gray-50 transition-colors flex-1">
                     <RadioGroupItem value="yes" />
-                    <ThumbsUp className="h-4 w-4 text-emerald-600" />
-                    Yes
+                    <ThumbsUp className="h-5 w-5 text-green-600" />
+                    <span className="font-medium">Yes</span>
                   </Label>
-                  <Label className="flex items-center gap-2 cursor-pointer">
+                  <Label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 hover:bg-gray-50 transition-colors flex-1">
                     <RadioGroupItem value="maybe" />
-                    <Meh className="h-4 w-4 text-amber-600" />
-                    Maybe
+                    <Meh className="h-5 w-5 text-amber-600" />
+                    <span className="font-medium">Maybe</span>
                   </Label>
-                  <Label className="flex items-center gap-2 cursor-pointer">
+                  <Label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 hover:bg-gray-50 transition-colors flex-1">
                     <RadioGroupItem value="no" />
-                    <ThumbsDown className="h-4 w-4 text-destructive" />
-                    No
+                    <ThumbsDown className="h-5 w-5 text-red-600" />
+                    <span className="font-medium">No</span>
                   </Label>
                 </RadioGroup>
               </div>
 
               {/* Comments */}
               <div>
-                <Label className="text-sm font-medium">Additional Comments</Label>
+                <Label className="text-base font-bold text-gray-900 mb-3 block">Additional Comments</Label>
                 <Textarea
                   value={formData.comments}
                   onChange={(e) => setFormData(prev => ({ ...prev, comments: e.target.value }))}
                   placeholder="Share any additional thoughts about your experience..."
-                  className="mt-2"
-                  rows={3}
+                  className="min-h-[100px] resize-none border-2 rounded-xl"
+                  rows={4}
                 />
               </div>
             </div>
 
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowFeedbackDialog(false)}>Cancel</Button>
-              <Button onClick={submitFeedback}>
+            <DialogFooter className="gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowFeedbackDialog(false)}
+                className="border-2"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={submitFeedback}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-md"
+              >
                 <Send className="h-4 w-4 mr-2" />
                 Submit Feedback
               </Button>

@@ -35,7 +35,7 @@ const roleConfig = {
   }
 };
 
-const brandColor = '#069468';
+const brandColor = '#20A0D8';
 
 // Password strength calculator
 const calculatePasswordStrength = (password: string): { strength: number; label: string; color: string } => {
@@ -194,7 +194,7 @@ export default function AuthPage() {
         className={`branding-panel hidden lg:flex ${mode === 'signin' ? 'signin-mode' : 'signup-mode'} relative overflow-hidden p-12`}
         style={{ backgroundColor: brandColor }}
       >
-          <div className="absolute inset-0 bg-gradient-to-br from-[#069468] via-[#069468] to-[#047353] opacity-95" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#20A0D8] via-[#20A0D8] to-[#20A0D8] opacity-95" />
           <div className="absolute inset-0">
             <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-10 -translate-x-1/2 -translate-y-1/2" 
               style={{ backgroundColor: 'white' }} />

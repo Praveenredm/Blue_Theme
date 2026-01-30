@@ -1,28 +1,42 @@
-import React from 'react';
-import { SidebarNavItem } from './SidebarNavItem';
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
   Calendar,
   MessageSquare,
-  Heart,
   Star
-} from 'lucide-react';
+} from "lucide-react";
+
+const navItems = [
+  { to: "/patient", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/patient/referrals", label: "My Referrals", icon: FileText },
+  { to: "/patient/appointments", label: "Appointments", icon: Calendar },
+  { to: "/patient/chat", label: "Health Assistant", icon: MessageSquare },
+  { to: "/patient/feedback", label: "Feedback", icon: Star }
+];
 
 export function PatientSidebar() {
   return (
-    <nav className="flex flex-col gap-1 p-4">
-      <div className="mb-4">
-        <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Navigation
-        </h3>
+    <nav className="w-full flex justify-center">
+      <div className="flex flex-wrap gap-2 bg-card border border-border rounded-xl p-2">
+        {navItems.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
+               ${
+                 isActive
+                   ? "bg-primary text-primary-foreground"
+                   : "text-muted-foreground hover:bg-muted"
+               }`
+            }
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </NavLink>
+        ))}
       </div>
-      <SidebarNavItem to="/patient" icon={<LayoutDashboard />} label="Dashboard" />
-      <SidebarNavItem to="/patient/referrals" icon={<FileText />} label="My Referrals" />
-      <SidebarNavItem to="/patient/appointments" icon={<Calendar />} label="Appointments" />
-      <SidebarNavItem to="/patient/chat" icon={<MessageSquare />} label="Health Assistant" />
-      <SidebarNavItem to="/patient/recommendations" icon={<Heart />} label="Care Recommendations" />
-      <SidebarNavItem to="/patient/feedback" icon={<Star />} label="Feedback" />
     </nav>
   );
 }

@@ -48,9 +48,11 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-card">
         <div className="flex h-16 items-center px-4 md:px-6">
+
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
@@ -68,21 +70,26 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Activity className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg hidden sm:block">Refer.ai </span>
+            <span className="font-semibold text-lg hidden sm:block">
+              Refer.ai
+            </span>
           </Link>
 
           {/* Page Title */}
-          <h1 className="text-lg font-medium hidden md:block">{title}</h1>
+          <h1 className="text-lg font-medium hidden md:block">
+            {title}
+          </h1>
 
-          {/* Right Side */}
+          {/* Right Actions */}
           <div className="ml-auto flex items-center gap-2">
+
             {/* Notifications */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <Badge 
+                    <Badge
                       className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
                       variant="destructive"
                     >
@@ -94,12 +101,12 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
               <DropdownMenuContent align="end" className="w-80">
                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <div className="max-h-64 overflow-auto">
-                  <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
-                    <span className="font-medium">Welcome to Refer.ai</span>
-                    <span className="text-sm text-muted-foreground">Your intelligent healthcare platform is ready.</span>
-                  </DropdownMenuItem>
-                </div>
+                <DropdownMenuItem className="flex flex-col items-start gap-1 p-3">
+                  <span className="font-medium">Welcome to Refer.ai</span>
+                  <span className="text-sm text-muted-foreground">
+                    Your intelligent healthcare platform is ready.
+                  </span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -114,7 +121,9 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
                   </Avatar>
                   <div className="hidden md:flex flex-col items-start text-sm">
                     <span className="font-medium">{user?.name}</span>
-                    <span className="text-xs text-muted-foreground">{roleLabels[user?.role || 'patient']}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {roleLabels[user?.role || 'patient']}
+                    </span>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
@@ -130,28 +139,32 @@ export function DashboardLayout({ children, sidebar, title }: DashboardLayoutPro
                   Settings
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex">
-        {/* Desktop Sidebar */}
-        <aside className="hidden md:flex w-64 flex-col fixed left-0 top-16 h-[calc(100vh-4rem)] border-r border-border bg-card">
-          {sidebar}
-        </aside>
+      {/* MAIN CONTENT */}
+      <main className="p-4 md:p-6 space-y-6">
 
-        {/* Content */}
-        <main className="flex-1 md:ml-64 p-4 md:p-6">
-          {children}
-        </main>
-      </div>
+        {/* 🔵 TOP NAVIGATION (FORMER SIDEBAR) */}
+        <div className="hidden md:flex justify-center">
+          {sidebar}
+        </div>
+
+        {/* PAGE CONTENT */}
+        {children}
+      </main>
+
     </div>
   );
 }

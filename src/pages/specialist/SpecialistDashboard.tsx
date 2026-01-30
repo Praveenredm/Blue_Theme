@@ -14,7 +14,10 @@ import {
   AlertCircle,
   CheckCircle,
   ArrowRight,
-  XCircle
+  XCircle,
+  TrendingUp,
+  TrendingDown,
+  User
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -72,22 +75,23 @@ export default function SpecialistDashboard() {
 
   return (
     <DashboardLayout sidebar={<SpecialistSidebar />} title="Specialist Dashboard">
-      <div className="space-y-6">
-        {/* Welcome Section */}
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        
+        {/* Welcome Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight">Welcome, Dr. Rodriguez</h2>
-            <p className="text-muted-foreground">Cardiology • You have 3 new referral requests</p>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome, Dr. Rodriguez</h1>
+            <p className="text-gray-500 mt-1">Cardiology Specialist • You have 3 new referral requests</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Link to="/specialist/availability">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="h-11 gap-2 border-gray-300">
                 <Clock className="h-4 w-4" />
                 Update Availability
               </Button>
             </Link>
             <Link to="/specialist/requests">
-              <Button className="gap-2">
+              <Button className="h-11 gap-2 bg-blue-600 hover:bg-blue-700">
                 <FileInput className="h-4 w-4" />
                 View Requests
                 <Badge variant="destructive" className="ml-1">3</Badge>
@@ -96,80 +100,136 @@ export default function SpecialistDashboard() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            title="Pending Requests"
-            value={3}
-            description="Awaiting your response"
-            icon={<FileInput className="h-5 w-5" />}
-          />
-          <StatCard
-            title="Today's Appointments"
-            value={5}
-            description="2 completed, 3 remaining"
-            icon={<Calendar className="h-5 w-5" />}
-          />
-          <StatCard
-            title="Avg Wait Time"
-            value="4 days"
-            description="Better than peers"
-            icon={<Clock className="h-5 w-5" />}
-            trend={{ value: -15, label: 'improvement' }}
-          />
-          <StatCard
-            title="Outcome Success"
-            value="96%"
-            description="Positive patient outcomes"
-            icon={<Award className="h-5 w-5" />}
-            trend={{ value: 3, label: 'vs last quarter' }}
-          />
+        {/* Stats Grid - Matching Reference Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Pending Requests */}
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <FileInput className="h-5 w-5 text-red-500" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Pending Requests</span>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-1">3</div>
+              <div className="h-1 w-16 bg-red-500 rounded-full mb-3"></div>
+              <p className="text-sm text-gray-600">Awaiting your response</p>
+            </CardContent>
+          </Card>
+
+          {/* Today's Appointments */}
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Today's Appointments</span>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-1">5</div>
+              <div className="h-1 w-16 bg-blue-500 rounded-full mb-3"></div>
+              <p className="text-sm text-gray-600">2 completed, 3 remaining</p>
+            </CardContent>
+          </Card>
+
+          {/* Avg Wait Time */}
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-green-500" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Avg Wait Time</span>
+              </div>
+              <div className="flex items-baseline gap-2 mb-1">
+                <div className="text-4xl font-bold text-gray-900">4</div>
+                <div className="text-xl font-semibold text-gray-600">days</div>
+              </div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-1 w-16 bg-green-500 rounded-full"></div>
+                <div className="flex items-center gap-1">
+                  <TrendingDown className="h-3 w-3 text-green-500" />
+                  <span className="text-xs font-medium text-green-600">-15%</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">Better than peers</p>
+            </CardContent>
+          </Card>
+
+          {/* Outcome Success */}
+          <Card className="bg-white border border-gray-200 shadow-sm">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <Award className="h-5 w-5 text-purple-500" />
+                </div>
+                <span className="text-sm font-medium text-gray-700">Outcome Success</span>
+              </div>
+              <div className="text-4xl font-bold text-gray-900 mb-1">96%</div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-1 w-16 bg-purple-500 rounded-full"></div>
+                <div className="flex items-center gap-1">
+                  <TrendingUp className="h-3 w-3 text-purple-500" />
+                  <span className="text-xs font-medium text-purple-600">+3%</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">Positive patient outcomes</p>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pending Referral Requests */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Pending Referral Requests</CardTitle>
-                <CardDescription>New cases requiring your attention</CardDescription>
+          <Card className="border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold">Pending Referral Requests</CardTitle>
+                  <CardDescription className="mt-1">New cases requiring your attention</CardDescription>
+                </div>
+                <Link to="/specialist/requests">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                    View All <ArrowRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <Link to="/specialist/requests">
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-6 space-y-4">
               {pendingRequests.map((request) => (
-                <div key={request.id} className="p-4 rounded-lg border border-border">
+                <div key={request.id} className="p-4 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-shadow">
                   <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium">{request.patient}</p>
-                        <Badge variant={
-                          request.urgency === 'high' ? 'destructive' :
-                          request.urgency === 'medium' ? 'default' : 'secondary'
-                        } className="text-xs">
-                          {request.urgency}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="font-semibold text-gray-900">{request.patient}</p>
+                        <Badge 
+                          className={`text-xs font-medium ${
+                            request.urgency === 'high' 
+                              ? 'bg-red-100 text-red-700 hover:bg-red-100' 
+                              : request.urgency === 'medium' 
+                              ? 'bg-orange-100 text-orange-700 hover:bg-orange-100' 
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
+                          } border-0`}
+                        >
+                          {request.urgency.toUpperCase()}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{request.condition}</p>
+                      <p className="text-sm text-gray-600 mb-2">{request.condition}</p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <User className="h-3 w-3" />
+                        <span>Referred by {request.referredBy}</span>
+                      </div>
                     </div>
-                    <span className="text-xs text-muted-foreground">{request.receivedDate}</span>
+                    <span className="text-xs text-gray-500 whitespace-nowrap ml-4">{request.receivedDate}</span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">From: {request.referredBy}</span>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="h-8">
-                        <XCircle className="h-4 w-4 mr-1" />
-                        Decline
-                      </Button>
-                      <Button size="sm" className="h-8">
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Accept
-                      </Button>
-                    </div>
+                  <div className="flex gap-2 pt-3 border-t border-gray-100">
+                    <Button size="sm" variant="outline" className="flex-1 h-9 border-gray-300 text-gray-700 hover:bg-gray-50">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Decline
+                    </Button>
+                    <Button size="sm" className="flex-1 h-9 bg-blue-600 hover:bg-blue-700">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Accept
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -177,38 +237,46 @@ export default function SpecialistDashboard() {
           </Card>
 
           {/* Today's Schedule */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Today's Schedule</CardTitle>
-                <CardDescription>January 25, 2026</CardDescription>
+          <Card className="border border-gray-200 shadow-sm">
+            <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold">Today's Schedule</CardTitle>
+                  <CardDescription className="mt-1">January 25, 2026</CardDescription>
+                </div>
+                <Link to="/specialist/treatment">
+                  <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                    View All <ArrowRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-              <Link to="/specialist/treatment">
-                <Button variant="ghost" size="sm">
-                  View All <ArrowRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-6 space-y-4">
               {todayAppointments.map((apt) => (
-                <div key={apt.id} className="flex items-center justify-between p-4 rounded-lg border border-border">
+                <div key={apt.id} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:shadow-sm transition-shadow">
                   <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <div className="text-sm font-medium">{apt.time}</div>
+                    <div className="text-center min-w-[70px]">
+                      <div className="text-base font-semibold text-gray-900">{apt.time}</div>
                     </div>
-                    <div className="h-8 border-l border-border"></div>
+                    <div className="h-12 w-px bg-gray-200"></div>
                     <div>
-                      <p className="font-medium">{apt.patient}</p>
-                      <p className="text-sm text-muted-foreground">{apt.type}</p>
+                      <p className="font-semibold text-gray-900">{apt.patient}</p>
+                      <p className="text-sm text-gray-600">{apt.type}</p>
                     </div>
                   </div>
-                  <Badge variant={
-                    apt.status === 'completed' ? 'secondary' :
-                    apt.status === 'in-progress' ? 'default' : 'outline'
-                  }>
+                  <Badge 
+                    className={`font-medium ${
+                      apt.status === 'completed' 
+                        ? 'bg-green-100 text-green-700 hover:bg-green-100' 
+                        : apt.status === 'in-progress' 
+                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-100' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
+                    } border-0`}
+                  >
                     {apt.status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
                     {apt.status === 'in-progress' && <Clock className="h-3 w-3 mr-1" />}
-                    {apt.status}
+                    {apt.status === 'upcoming' && <Calendar className="h-3 w-3 mr-1" />}
+                    {apt.status.replace('-', ' ')}
                   </Badge>
                 </div>
               ))}
@@ -217,33 +285,36 @@ export default function SpecialistDashboard() {
         </div>
 
         {/* Performance Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Weekly Performance</CardTitle>
-            <CardDescription>Your metrics compared to department average</CardDescription>
+        <Card className="border border-gray-200 shadow-sm">
+          <CardHeader className="border-b border-gray-100 bg-gray-50/50">
+            <CardTitle className="text-lg font-semibold">Weekly Performance</CardTitle>
+            <CardDescription className="mt-1">Your metrics compared to department average</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
+          <CardContent className="pt-6">
+            <div className="grid md:grid-cols-3 gap-8">
               <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Referrals Processed</span>
-                  <span className="font-medium">18/20</span>
+                <div className="flex justify-between items-center text-sm mb-3">
+                  <span className="font-medium text-gray-700">Referrals Processed</span>
+                  <span className="text-2xl font-bold text-gray-900">18<span className="text-base text-gray-500">/20</span></span>
                 </div>
-                <Progress value={90} className="h-2" />
+                <Progress value={90} className="h-2.5 bg-gray-100" />
+                <p className="text-xs text-gray-500 mt-2">90% completion rate</p>
               </div>
               <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Patient Satisfaction</span>
-                  <span className="font-medium">4.8/5.0</span>
+                <div className="flex justify-between items-center text-sm mb-3">
+                  <span className="font-medium text-gray-700">Patient Satisfaction</span>
+                  <span className="text-2xl font-bold text-gray-900">4.8<span className="text-base text-gray-500">/5.0</span></span>
                 </div>
-                <Progress value={96} className="h-2" />
+                <Progress value={96} className="h-2.5 bg-gray-100" />
+                <p className="text-xs text-gray-500 mt-2">Exceeds department average</p>
               </div>
               <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Outcome Reports Filed</span>
-                  <span className="font-medium">15/18</span>
+                <div className="flex justify-between items-center text-sm mb-3">
+                  <span className="font-medium text-gray-700">Outcome Reports Filed</span>
+                  <span className="text-2xl font-bold text-gray-900">15<span className="text-base text-gray-500">/18</span></span>
                 </div>
-                <Progress value={83} className="h-2" />
+                <Progress value={83} className="h-2.5 bg-gray-100" />
+                <p className="text-xs text-gray-500 mt-2">3 reports pending</p>
               </div>
             </div>
           </CardContent>

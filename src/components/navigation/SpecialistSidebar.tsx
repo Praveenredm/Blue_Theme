@@ -1,26 +1,49 @@
-import React from 'react';
-import { SidebarNavItem } from './SidebarNavItem';
+import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   FileInput,
   Clock,
   Pill,
   ClipboardCheck
-} from 'lucide-react';
+} from "lucide-react";
+
+const navItems = [
+  { to: "/specialist", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/specialist/requests", label: "Referral Requests", icon: FileInput, badge: 3 },
+  { to: "/specialist/availability", label: "Availability", icon: Clock },
+  { to: "/specialist/treatment", label: "Patient Treatment", icon: Pill },
+  { to: "/specialist/outcomes", label: "Outcome Submission", icon: ClipboardCheck }
+];
 
 export function SpecialistSidebar() {
   return (
-    <nav className="flex flex-col gap-1 p-4">
-      <div className="mb-4">
-        <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Navigation
-        </h3>
+    <nav className="w-full mb-6">
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-xl border bg-card p-2 shadow-sm">
+        {navItems.map(({ to, label, icon: Icon, badge }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end
+            className={({ isActive }) =>
+              `relative flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted"
+              }`
+            }
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+
+            {badge && (
+              <span className="ml-1 rounded-full bg-destructive px-2 py-0.5 text-xs text-white">
+                {badge}
+              </span>
+            )}
+          </NavLink>
+        ))}
       </div>
-      <SidebarNavItem to="/specialist" icon={<LayoutDashboard />} label="Dashboard" />
-      <SidebarNavItem to="/specialist/requests" icon={<FileInput />} label="Referral Requests" badge={3} />
-      <SidebarNavItem to="/specialist/availability" icon={<Clock />} label="Availability" />
-      <SidebarNavItem to="/specialist/treatment" icon={<Pill />} label="Patient Treatment" />
-      <SidebarNavItem to="/specialist/outcomes" icon={<ClipboardCheck />} label="Outcome Submission" />
     </nav>
   );
 }

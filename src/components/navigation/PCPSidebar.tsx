@@ -1,5 +1,5 @@
-import React from 'react';
-import { SidebarNavItem } from './SidebarNavItem';
+import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   UserPlus,
@@ -7,22 +7,39 @@ import {
   Users,
   Stethoscope,
   TrendingUp
-} from 'lucide-react';
+} from "lucide-react";
+
+const navItems = [
+  { to: "/pcp", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/pcp/patient-entry", label: "Patient Data Entry", icon: UserPlus },
+  { to: "/pcp/evaluation", label: "Referral Evaluation", icon: FileSearch },
+  { to: "/pcp/matching", label: "Specialist Matching", icon: Users },
+  { to: "/pcp/alternative", label: "Alternative Care", icon: Stethoscope },
+  { to: "/pcp/progress", label: "Patient Progress", icon: TrendingUp }
+];
 
 export function PCPSidebar() {
   return (
-    <nav className="flex flex-col gap-1 p-4">
-      <div className="mb-4">
-        <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-          Navigation
-        </h3>
+    <nav className="w-full mb-6">
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-xl border bg-card p-2 shadow-sm">
+        {navItems.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end
+            className={({ isActive }) =>
+              `flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+                isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted"
+              }`
+            }
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </NavLink>
+        ))}
       </div>
-      <SidebarNavItem to="/pcp" icon={<LayoutDashboard />} label="Dashboard" />
-      <SidebarNavItem to="/pcp/patient-entry" icon={<UserPlus />} label="Patient Data Entry" />
-      <SidebarNavItem to="/pcp/evaluation" icon={<FileSearch />} label="Referral Evaluation" />
-      <SidebarNavItem to="/pcp/matching" icon={<Users />} label="Specialist Matching" />
-      <SidebarNavItem to="/pcp/alternative" icon={<Stethoscope />} label="Alternative Care" />
-      <SidebarNavItem to="/pcp/progress" icon={<TrendingUp />} label="Patient Progress" />
     </nav>
   );
 }
