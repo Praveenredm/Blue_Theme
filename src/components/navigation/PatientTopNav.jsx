@@ -12,7 +12,7 @@ const navItems = [
   { label: "Dashboard", path: "/patient/dashboard", icon: LayoutDashboard },
   { label: "Referrals", path: "/patient/referrals", icon: FileText },
   { label: "Appointments", path: "/patient/appointments", icon: Calendar },
-  { label: "Assistant", path: "/patient/chat", icon: MessageSquare },
+ // { label: "Assistant", path: "/patient/chat", icon: MessageSquare },
   { label: "Care", path: "/patient/care", icon: HeartPulse },
   { label: "Feedback", path: "/patient/feedback", icon: Star },
 ];

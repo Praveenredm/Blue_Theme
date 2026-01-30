@@ -206,7 +206,7 @@ export default function AuthPage() {
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
               <img
-                src="/icons/medical-wave.png"
+                src="/icons/1.png"
                 alt="Refero AI Logo"
                 className="h-8 w-8 object-contain"
               />
@@ -222,28 +222,28 @@ export default function AuthPage() {
             AI-powered triage, specialty matching, and care coordination for better patient outcomes.
           </p>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <div className="text-3xl font-bold mb-1">40%</div>
-              <div className="text-sm text-white/70">Fewer unnecessary referrals</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+             <div className="text-3xl font-bold mb-1">40%</div>
+            <div className="text-sm text-white/70">Fewer unnecessary referrals</div>
+            </div> */}
+            {/* <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">60%</div>
               <div className="text-sm text-white/70">Faster specialist matching</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            </div> */}
+            {/* <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">95%</div>
               <div className="text-sm text-white/70">Patient satisfaction</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            </div> */}
+            {/* <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
               <div className="text-3xl font-bold mb-1">24/7</div>
               <div className="text-sm text-white/70">AI health assistant</div>
-            </div>
+            </div> */}
+            {/* > */}
           </div>
         </div>
-        </div>
 
-      {/* Right Panel - Auth Forms */}
+     {/* Right Panel - Auth Forms */}
       <div className={`auth-panel lg:bg-white ${mode === 'signin' ? 'signin-mode' : 'signup-mode'} relative overflow-hidden p-4 sm:p-6`}>
           <div className="w-full max-w-md">
             {/* Sign In Form */}

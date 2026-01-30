@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PatientSidebar } from '@/components/navigation/PatientSidebar';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,7 +20,9 @@ import {
   CheckCircle,
   X,
   FileText,
-  Bell
+  Bell,
+  Navigation,
+  Zap
 } from 'lucide-react';
 
 interface Appointment {
@@ -37,7 +39,25 @@ interface Appointment {
   status: 'upcoming' | 'completed' | 'cancelled';
   notes?: string;
   prepInstructions?: string[];
+  coordinates?: {
+    doctorLat: number;
+    doctorLng: number;
+    patientLat: number;
+    patientLng: number;
+  };
 }
+
+// Helper function to calculate distance between two coordinates (Haversine formula)
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 
 const mockAppointments: Appointment[] = [
   {
@@ -57,7 +77,13 @@ const mockAppointments: Appointment[] = [
       'List of current medications',
       'Arrive 15 minutes early to complete paperwork',
       'Wear comfortable clothing for examination'
-    ]
+    ],
+    coordinates: {
+      doctorLat: 40.7589,
+      doctorLng: -73.9851,
+      patientLat: 40.7614,
+      patientLng: -73.9776
+    }
   },
   {
     id: '2',
@@ -89,7 +115,13 @@ const mockAppointments: Appointment[] = [
     location: 'Skin Care Clinic, 789 Health Ave',
     phone: '(555) 345-6789',
     status: 'upcoming',
-    notes: 'Skin lesion examination'
+    notes: 'Skin lesion examination',
+    coordinates: {
+      doctorLat: 40.7505,
+      doctorLng: -73.9972,
+      patientLat: 40.7614,
+      patientLng: -73.9776
+    }
   },
   {
     id: '4',
@@ -101,7 +133,13 @@ const mockAppointments: Appointment[] = [
     duration: '60 min',
     location: 'Neuro Center, 321 Brain Way',
     status: 'completed',
-    notes: 'Migraine management consultation'
+    notes: 'Migraine management consultation',
+    coordinates: {
+      doctorLat: 40.7549,
+      doctorLng: -73.9840,
+      patientLat: 40.7614,
+      patientLng: -73.9776
+    }
   },
   {
     id: '5',
@@ -116,11 +154,161 @@ const mockAppointments: Appointment[] = [
   }
 ];
 
+// OpenStreetMap Component
+const MapComponent = ({ appointment }: { appointment: Appointment | null }) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<any>(null);
+  const mapLoaded = useRef(false);
+
+  useEffect(() => {
+    if (!mapContainer.current || !appointment?.coordinates) return;
+
+    // Dynamically load Leaflet
+    if (!mapLoaded.current) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
+      document.head.appendChild(link);
+
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+      script.onload = () => {
+        initializeMap();
+      };
+      document.body.appendChild(script);
+      mapLoaded.current = true;
+    } else {
+      initializeMap();
+    }
+
+    function initializeMap() {
+      const L = (window as any).L;
+      if (!L) return;
+
+      const { doctorLat, doctorLng, patientLat, patientLng } = appointment.coordinates!;
+      const distance = calculateDistance(patientLat, patientLng, doctorLat, doctorLng);
+
+      // Calculate center point
+      const centerLat = (patientLat + doctorLat) / 2;
+      const centerLng = (patientLng + doctorLng) / 2;
+
+      // Initialize map
+      if (!map.current) {
+        map.current = L.map(mapContainer.current).setView([centerLat, centerLng], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+          maxZoom: 19,
+        }).addTo(map.current);
+      } else {
+        map.current.setView([centerLat, centerLng], 14);
+      }
+
+      // Clear existing markers
+      map.current.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker) {
+          map.current.removeLayer(layer);
+        }
+      });
+
+      // Custom icons HTML
+      const patientIcon = L.divIcon({
+        html: `
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full border-4 border-white shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        `,
+        className: 'custom-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40]
+      });
+
+      const doctorIcon = L.divIcon({
+        html: `
+          <div class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full border-4 border-white shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.5 1.5H9.5a.5.5 0 00-.5.5v1h2v-1a.5.5 0 00-.5-.5zM6 4H4a2 2 0 00-2 2v3a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2v-.5a.5.5 0 00-1 0V4h-2v-.5a.5.5 0 00-1 0V4H6v-.5a.5.5 0 00-1 0V4zm-2 9a2 2 0 002 2h12a2 2 0 002-2v-1H4v1z" />
+            </svg>
+          </div>
+        `,
+        className: 'custom-marker',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40]
+      });
+
+      // Add markers
+      L.marker([patientLat, patientLng], { icon: patientIcon })
+        .addTo(map.current)
+        .bindPopup(`<div class="font-semibold text-gray-900">📍 Your Location</div>`)
+        .openPopup();
+
+      L.marker([doctorLat, doctorLng], { icon: doctorIcon })
+        .addTo(map.current)
+        .bindPopup(`<div class="font-semibold text-gray-900">🏥 ${appointment.doctor}</div>`)
+        .openPopup();
+
+      // Draw line between points
+      const polyline = L.polyline([
+        [patientLat, patientLng],
+        [doctorLat, doctorLng]
+      ], {
+        color: '#3b82f6',
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '5, 5',
+        lineCap: 'round'
+      }).addTo(map.current);
+
+      // Fit bounds
+      const bounds = L.latLngBounds([
+        [patientLat, patientLng],
+        [doctorLat, doctorLng]
+      ]);
+      map.current.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [appointment?.coordinates]);
+
+  if (!appointment?.coordinates) {
+    return (
+      <div className="h-96 rounded-xl border-2 border-gray-200 flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600 font-medium">Telehealth appointments don't require location information</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div ref={mapContainer} className="h-96 rounded-xl border-2 border-gray-200 overflow-hidden shadow-md" />
+      {appointment.coordinates && (
+        <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl border-2 border-blue-100">
+          <div className="flex items-center gap-3 mb-2">
+            <Navigation className="h-5 w-5 text-blue-600" />
+            <span className="font-bold text-gray-900">
+              Distance: {calculateDistance(
+                appointment.coordinates.patientLat,
+                appointment.coordinates.patientLng,
+                appointment.coordinates.doctorLat,
+                appointment.coordinates.doctorLng
+              ).toFixed(2)} km
+            </span>
+          </div>
+          <p className="text-sm text-gray-600">Direct distance from your location to the medical facility</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function Appointments() {
   const { toast } = useToast();
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showMapDialog, setShowMapDialog] = useState(false);
 
   const upcomingAppointments = mockAppointments.filter(a => a.status === 'upcoming');
   const pastAppointments = mockAppointments.filter(a => ['completed', 'cancelled'].includes(a.status));
@@ -152,6 +340,14 @@ export default function Appointments() {
     const isUpcoming = appointment.status === 'upcoming';
     const dateLabel = getDateLabel(appointment.date);
     const isNearby = isToday(appointment.date) || isTomorrow(appointment.date);
+    const distance = appointment.coordinates
+      ? calculateDistance(
+          appointment.coordinates.patientLat,
+          appointment.coordinates.patientLng,
+          appointment.coordinates.doctorLat,
+          appointment.coordinates.doctorLng
+        )
+      : null;
 
     return (
       <Card className={cn(
@@ -213,6 +409,12 @@ export default function Appointments() {
                     <Clock className="h-4 w-4 text-blue-600" />
                     {appointment.time} ({appointment.duration})
                   </span>
+                  {distance && (
+                    <span className="flex items-center gap-1.5 font-medium text-gray-600">
+                      <Navigation className="h-4 w-4 text-emerald-600" />
+                      {distance.toFixed(1)} km away
+                    </span>
+                  )}
                   {appointment.location && (
                     <span className="flex items-center gap-1.5 font-medium text-gray-600">
                       <MapPin className="h-4 w-4 text-green-600" />
@@ -226,6 +428,20 @@ export default function Appointments() {
             {/* Actions - Enhanced */}
             {isUpcoming && (
               <div className="flex gap-2 lg:flex-col lg:min-w-[150px]">
+                {appointment.type === 'in-person' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 border-2 hover:border-emerald-300 hover:bg-emerald-50"
+                    onClick={() => {
+                      setSelectedAppointment(appointment);
+                      setShowMapDialog(true);
+                    }}
+                  >
+                    <MapPin className="h-4 w-4 mr-1" />
+                    Map
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
@@ -374,6 +590,33 @@ export default function Appointments() {
           </TabsContent>
         </Tabs>
 
+        {/* Map Dialog */}
+        <Dialog open={showMapDialog} onOpenChange={setShowMapDialog}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+                <MapPin className="h-6 w-6 text-emerald-600" />
+                Location Map
+              </DialogTitle>
+              <DialogDescription className="text-base">
+                View your location and {selectedAppointment?.doctor}'s clinic
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <MapComponent appointment={selectedAppointment} />
+            </div>
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowMapDialog(false)}
+                className="border-2"
+              >
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Enhanced Details Dialog */}
         <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
           <DialogContent className="max-w-lg">
@@ -414,6 +657,22 @@ export default function Appointments() {
                       <MapPin className="h-4 w-4 text-green-600" /> Location
                     </p>
                     <p className="font-semibold text-gray-900">{selectedAppointment.location}</p>
+                  </div>
+                )}
+
+                {selectedAppointment.coordinates && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
+                      <Navigation className="h-4 w-4 text-emerald-600" /> Distance
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {calculateDistance(
+                        selectedAppointment.coordinates.patientLat,
+                        selectedAppointment.coordinates.patientLng,
+                        selectedAppointment.coordinates.doctorLat,
+                        selectedAppointment.coordinates.doctorLng
+                      ).toFixed(2)} km
+                    </p>
                   </div>
                 )}
 
